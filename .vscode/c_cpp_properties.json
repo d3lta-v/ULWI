@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Mongoose OS on Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../mongoose-os/fw/include",
+                "${workspaceFolder}/../mongoose-os/frozen",
+                "${workspaceFolder}/../mongoose-os/fw/src",
+                "${workspaceFolder}/../mongoose-os"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

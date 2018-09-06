@@ -1,0 +1,13 @@
+{
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "files.associations": {
+        "mgos.h": "c",
+        "mgos_gpio.h": "c",
+        "mgos_net.h": "c",
+        "mgos_init.h": "c",
+        "mgos_features.h": "c",
+        "mgos_system.h": "c",
+        "mgos_sys_config.h": "c"
+    }
+}

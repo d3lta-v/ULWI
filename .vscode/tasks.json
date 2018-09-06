@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "command": "mos",
+    "echoCommand": true,
+    "tasks": [
+        {
+            "label": "build",
+            "group": "build",
+            "args": [
+                "--arch",
+                "esp8266"
+            ],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "flash",
+            "group": "build",
+            "args": [
+                "--esp-flash-params",
+                "qio,8m,40m" // Flash with QIO instead of DIO, with 1Mbyte flash. Remove this line if using default
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "console",
+            "group": "build",
+            "args": [],
+            "problemMatcher": []
+        }
+    ]
+}
