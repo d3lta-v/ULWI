@@ -8,6 +8,10 @@
         "mgos_init.h": "c",
         "mgos_features.h": "c",
         "mgos_system.h": "c",
-        "mgos_sys_config.h": "c"
+        "mgos_sys_config.h": "c",
+        "iterator": "c",
+        "string": "c",
+        "string_view": "c",
+        "vector": "c"
     }
 }
