@@ -14,6 +14,14 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "/Users/panziyue/Library/Arduino15/packages/esp8266/tools/**",
+                "/Users/panziyue/Library/Arduino15/packages/esp8266/hardware/esp8266/2.4.1/**"
+            ],
+            "forcedInclude": []
         }
     ],
     "version": 4
