@@ -138,6 +138,10 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_strncmp(line, COMMAND_VER, 3) == 0)
         {
             mgos_uart_printf(UART_NO, "v1.0-alpha1\r\n");
+        } 
+        else if (mg_strncmp(line, COMMAND_RST, 3) == 0)
+        {
+            mgos_system_restart();
         }
         else
         {
@@ -170,6 +174,8 @@ enum mgos_app_init_result mgos_app_init(void)
     ucfg.baud_rate = 9600; /* Defaults to 115200 in development, 9600 in production */
 #endif
     ucfg.num_data_bits = 8;
+    ucfg.rx_buf_size = 1024;
+    ucfg.tx_buf_size = 1024;
     ucfg.parity = MGOS_UART_PARITY_NONE;
     ucfg.stop_bits = MGOS_UART_STOP_BITS_1;
     if (!mgos_uart_configure(UART_NO, &ucfg))
