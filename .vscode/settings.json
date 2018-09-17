@@ -12,6 +12,10 @@
         "string": "c",
         "string_view": "c",
         "vector": "c",
-        "__locale": "c"
+        "__locale": "c",
+        "exception": "c",
+        "bitset": "c",
+        "iosfwd": "c",
+        "platform.h": "c"
     }
 }
