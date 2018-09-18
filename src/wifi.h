@@ -1,8 +1,8 @@
 /******************************************************************************
  *                                                                            *
- * NAME: constants.h                                                          *
+ * NAME: wifi.h                                                               *
  *                                                                            *
- * PURPOSE: Defines global constants such as commands                         *
+ * PURPOSE: Provides Wi-Fi helper functions and data                          *
  *                                                                            *
  * GLOBAL VARIABLES:                                                          *
  *                                                                            *
@@ -16,16 +16,12 @@
  *                                                                            *
  *****************************************************************************/
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef WIFI_H
+#define WIFI_H
 
 #include "mgos.h"
 
-#define UART_NO 0
-
-static const struct mg_str COMMAND_NOP = MG_MK_STR("nop");
-static const struct mg_str COMMAND_VER = MG_MK_STR("ver");
-static const struct mg_str COMMAND_RST = MG_MK_STR("rst");
-static const struct mg_str COMMAND_LAP = MG_MK_STR("lap");
+void wifi_cb(int ev, void *evd, void *arg);
+void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg);
 
 #endif

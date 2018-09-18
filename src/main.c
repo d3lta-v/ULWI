@@ -41,21 +41,10 @@
 #include "mgos.h"
 
 #include "constants.h"
-
-#define UART_NO 0
+#include "wifi.h"
 
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
-
-// static void timer_cb(void *arg)
-// {
-//     /*
-//      * Note: do not use mgos_uart_write to output to console UART (0 in our case).
-//      * It will work, but output may be scrambled by console debug output.
-//      */
-//     mgos_uart_printf(UART_NO, "Hello, UART1!\r\n");
-//     (void)arg;
-// }
 
 /******************************************************************************
  *                                                                            *
@@ -143,6 +132,11 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             mgos_system_restart();
         }
+        else if (mg_strncmp(line, COMMAND_LAP, 3) == 0)
+        {
+            mgos_wifi_scan(wifi_scan_cb, NULL);
+            mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, wifi_cb, NULL);
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");
@@ -160,7 +154,7 @@ enum mgos_app_init_result mgos_app_init(void)
 {
     /* Enable or disable logging based on the build environment */
 #ifdef DEVELOPMENT
-    cs_log_set_level(LL_VERBOSE_DEBUG); /* Enable max level logging */
+    cs_log_set_level(LL_INFO); /* Enable logging, but not too verbose */
 #else
     mgos_set_stdout_uart(-1);  /* Disables stdout */
     mgos_set_stderr_uart(-1);  /* Disables stderr */

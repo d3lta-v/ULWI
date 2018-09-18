@@ -16,6 +16,8 @@
         "exception": "c",
         "bitset": "c",
         "iosfwd": "c",
-        "platform.h": "c"
+        "platform.h": "c",
+        "constants.h": "c",
+        "ios": "c"
     }
 }
