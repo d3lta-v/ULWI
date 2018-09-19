@@ -42,20 +42,20 @@ HTTP method types:
 ### No Operation
 
 Command: `nop`  
-Type: Action
+Type: Action  
 Purpose: This command performs virtually nothing except forces the module to echo back a blank response consisting of a Windows-style newline (`\r\n`). Useful for testing if the module is functioning correctly or that the software is still responding.
 
 ### Display VERsion
 
 Command: `ver`  
-Type: Reply
+Type: Reply  
 Purpose: Outputs the firmware's version over the serial link. Useful for checking if the current firmware supports certain commands.  
 Output: `1.0-alpha1,Mongoose 2.5.1`
 
 ### ReSeT
 
 Command: `rst`  
-Type: Blocking Reply
+Type: Blocking Reply  
 Purpose: Performs a software reset of the module.
 
 ## Wi-Fi operations
@@ -63,14 +63,14 @@ Purpose: Performs a software reset of the module.
 ### List Access Points
 
 Command: `lap`  
-Type: Blocking Reply
+Type: Blocking Reply  
 Purpose: Lists all available access points in the vicinity. Comma delimited. This function may be *blocking*, meaning that it may take a significant amount of time to run.  
 Returns: `WiFi1,Wi-Fi Hotspot 2,AnotherWifi`
 
 ### Connect to Access Point
 
 Command: `cap <ssid>,<password>`  
-Type: Action
+Type: Action  
 Purpose: Connects to an access point with SSID and password. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
 Parameters:
 
@@ -80,14 +80,14 @@ Parameters:
 ### Status of Access Point
 
 Command: `sap`  
-Type: Reply
-Purpose: Checks if the ESP8266 is properly connected to an access point.
+Type: Reply  
+Purpose: Checks if the ESP8266 is properly connected to an access point.  
 Returns: `<S/U/P/N>,<ssid (only if connection is successful)>` based on the connectivity state.
 
 ### Disconnect from Access Point
 
 Command: `dap`  
-Type: Action
+Type: Action  
 Purpose: Disconnects from the currently connected access point.
 
 ## IP and DHCP operations
@@ -95,7 +95,7 @@ Purpose: Disconnects from the currently connected access point.
 ### Set DHCP enabled
 
 Command: `sde <T/F>`  
-Type: Action
+Type: Action  
 Purpose: Sets whether should DHCP be enabled  
 Parameters:
 
@@ -104,14 +104,14 @@ Parameters:
 ### Get IP
 
 Command: `gip`  
-Type: Blocking Reply
+Type: Blocking Reply  
 Purpose: Gets the current IP address of the module, when connected to Wi-Fi  
 Returns: `0` if there is no IP assigned, IP address if there is an IP
 
 ### Set IP
 
 Command: `sip <ip>,<gateway>,<netmask>`  
-Type: Action
+Type: Action  
 Purpose: Sets the IP address, gateway and netmask of the ESP8266, if we're using static IP. DHCP must be disabled prior to setting an IP address manually  
 Parameters:
 
@@ -124,7 +124,7 @@ Parameters:
 ### Initiate HTTP Request
 
 Command: `ihr <G/P>,<url>,<content>,<port (optional)>`  
-Type: Action
+Type: Action  
 Purpose: Initiates a HTTP request to a URL. This method does not report back on the progress or completion of the request.  
 Parameters:
 
@@ -138,7 +138,7 @@ Returns: A unique identifier or handle that identifies the HTTP request
 ### Status of HTTP Request
 
 Command: `shr <http request handle>`  
-Type: Reply
+Type: Reply  
 Purpose: Checks on the status of a HTTP request.  
 Parameters:
 
@@ -149,7 +149,7 @@ Returns: `<S/U/P/N>` based on the status of the connection. S -> Success, U -> U
 ### Get HTTP Response
 
 Command: `ghr <http request handle>,<S/H/C>,<T/F>`  
-Type: Reply/Blocking Reply
+Type: Reply/Blocking Reply  
 Purpose: Gets the result of a HTTP request. The request must be completed before attempting to retrieve it.  
 Parameters:
 
@@ -162,7 +162,7 @@ Returns: WIP
 ### Get HTTP Response Content as JSON
 
 Command: `jhr <http request handle>,<json map>`  
-Type: Reply/Blocking Reply
+Type: Reply/Blocking Reply  
 Purpose: Gets parts of the HTTP response as JSON  
 Parameters:
 
@@ -172,7 +172,7 @@ Parameters:
 ### Purge HTTP Response
 
 Command: `phr <http request handle>`  
-Type: Reply
+Type: Reply  
 Purpose: Frees the RAM taken by a HTTP response on the ESP8266 while freeing up the handle as well to be used by other HTTP requests  
 Parameters:
 
@@ -181,7 +181,7 @@ Parameters:
 ### Terminate HTTP request
 
 Command: `thr <http request handle>`  
-Type: Action
+Type: Action  
 Purpose: Terminates a HTTP request.  
 Parameters:
 
