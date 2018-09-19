@@ -2,6 +2,24 @@
 
 #include "constants.h"
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: wifi_cb                                                     *
+ *                                                                            *
+ * PURPOSE: Callback function that is called when a change in Wi-Fi state is  *
+ *          detected.                                                         *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * ev       int      I                                                        *
+ * evd      void     O                                                        *
+ * arg      void     O                                                        *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void wifi_cb(int ev, void *evd, void *arg)
 {
     const struct mgos_net_event_data *ev_data =
@@ -13,6 +31,24 @@ void wifi_cb(int ev, void *evd, void *arg)
     (void)arg;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: wifi_scan_cb                                                *
+ *                                                                            *
+ * PURPOSE: Callback function that is called when the device has completed    *
+ *          scanning for Wi-Fi devices                                        *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * n        int      I  Number of Wi-Fi hotspots scanned                      *
+ * res      struct   O  Result of the scan in an mgos_wifi_scan_result struct *
+ * arg      void     O                                                        *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg)
 {
     mgos_uart_printf(UART_NO, "WiFi scan result: SSIDs %d, arg %p, results:", n, arg);

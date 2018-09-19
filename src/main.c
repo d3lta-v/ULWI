@@ -29,11 +29,6 @@
  *                                                                            *
  * REQUIREMENTS/FUNCTIONAL SPECIFICATIONS REFERENCES: N/A                     *
  *                                                                            *
- * DEVELOPMENT HISTORY:                                                       *
- *                                                                            *
- * Date Author Change Id Release Description Of Change                        *
- * ---- ------ --------- ------- ---------------------                        *
- *                                                                            *
  * ALGORITHM (PDL)                                                            *
  *                                                                            *
  *****************************************************************************/
@@ -56,11 +51,11 @@
  *                                                                            *
  * ARGUMENTS:                                                                 *
  *                                                                            *
- * ARGUMENT TYPE I/O DESCRIPTION                                              *
- * -------- ---- --- -----------                                              *
- * uart_no  int   I  The UART port's identification number. Typically 0 for   *
- *                   the ESP8266-01 board.                                    *
- * arg      void* I  Arguments to be passed into the UART dispatcher          *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * uart_no  int      I  The UART port's identification number. Typically 0    *
+ *                      for the ESP8266-01 board.                             *
+ * arg      void*    I  Arguments to be passed into the UART dispatcher       *
  *                                                                            *
  * RETURNS: none                                                              *
  *                                                                            *

@@ -9,10 +9,6 @@
  * Variable Type Description                                                  *
  * -------- ---- -----------                                                  *
  *                                                                            *
- * DEVELOPMENT HISTORY:                                                       *
- *                                                                            *
- * Date Author Change Id Release Description Of Change                        *
- * ---- ------ --------- ------- ---------------------                        *
  *                                                                            *
  *****************************************************************************/
 
