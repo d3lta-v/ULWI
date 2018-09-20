@@ -49,7 +49,9 @@ As the master device such as an ATmega328P may not be able to handle overly larg
 
 ## Basic environment setup
 
-Make sure that you have cloned the [Mongoose OS Git repository](https://github.com/cesanta/mongoose-os) to your computer to allow IntelliSense to detect the headers. The repository should be placed in `${workspaceFolder}/../mongoose-os`.
+As this repository is a locally built repository, you must have Docker installed (for Mac, simply download, install, and start Docker from the official website). Docker must be configured to share this folder with Docker images so the build toolchain has permission to read and write in this folder.
+
+Make sure that you have built the firmware at least once for the `mos` tool to automatically download the Mongoose OS repository into `deps/modules` to allow IntelliSense to detect the headers.
 
 For optimal experience, install the Mongoose OS IDE extension in Visual Studio Code to configure the default serial port without having to manually set environment variables.
 

@@ -18,6 +18,8 @@
         "iosfwd": "c",
         "platform.h": "c",
         "constants.h": "c",
-        "ios": "c"
+        "ios": "c",
+        "__string": "c",
+        "mgos_wifi.h": "c"
     }
 }

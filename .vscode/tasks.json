@@ -8,7 +8,8 @@
             "group": "build",
             "args": [
                 "--arch",
-                "esp8266"
+                "esp8266",
+                "--local",
             ],
             "problemMatcher": {
                 "owner": "cpp",
