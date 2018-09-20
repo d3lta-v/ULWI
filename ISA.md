@@ -4,7 +4,7 @@ This document provides an outline of the instruction set, version 1.0-alpha1. Al
 
 If you are confused about what this instruction set is supposed to do, please read the original [README](README.md) document.
 
-All operations are terminated with a Windows style line ending, `\r\n`. To process messages involving multiple lines, please use UNIX style line endings (`\n`).
+All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To process messages involving multiple lines, please use UNIX style line endings (`\n`).
 
 The instruction set is inspired by CISC instruction sets such as x86, in order to provide as much functionality as possible, making programming easier for the master side.
 
@@ -22,98 +22,98 @@ This instruction set uses extensive amounts of letters to represent certain sett
 
 General booleans (describes general true or false statements):
 
-- T: True
-- F: False
+- **T**: True
+- **F**: False
 
 Task status (describes the status of a task, such as connection to an AP or a HTTP request):
 
-- S: Successful
-- U: Unsuccessful
-- P: In Progress (the task is being processed right now)
-- N: Not attempted (the task was never started in the first place)
+- **S**: Successful
+- **U**: Unsuccessful
+- **P**: In Progress (the task is being processed right now)
+- **N**: Not attempted (the task was never started in the first place)
 
 HTTP method types:
 
-- G: GET
-- P: POST
+- **G**: GET
+- **P**: POST
 
 ## Basic operations
 
 ### No Operation
 
-Command: `nop`  
-Type: Action  
-Purpose: This command performs virtually nothing except forces the module to echo back a blank response consisting of a Windows-style newline (`\r\n`). Useful for testing if the module is functioning correctly or that the software is still responding.
+**Command**: `nop`  
+**Type**: Action  
+**Purpose**: This command performs virtually nothing except forces the module to echo back a blank response consisting of a Windows-style newline (`\r\n`). Useful for testing if the module is functioning correctly or that the software is still responding.
 
 ### Display VERsion
 
-Command: `ver`  
-Type: Reply  
-Purpose: Outputs the firmware's version over the serial link. Useful for checking if the current firmware supports certain commands.  
-Output: `1.0-alpha1,Mongoose 2.5.1`
+**Command**: `ver`  
+**Type**: Reply  
+**Purpose**: Outputs the firmware's version over the serial link. Useful for checking if the current firmware supports certain commands.  
+**Output**: `1.0-alpha1`
 
 ### ReSeT
 
-Command: `rst`  
-Type: Blocking Reply  
-Purpose: Performs a software reset of the module.
+**Command**: `rst`  
+**Type**: Blocking Reply  
+**Purpose**: Performs a software reset of the module.
 
 ## Wi-Fi operations
 
 ### List Access Points
 
-Command: `lap`  
-Type: Blocking Reply  
-Purpose: Lists all available access points in the vicinity. Comma delimited. This function may be *blocking*, meaning that it may take a significant amount of time to run.  
-Returns: `WiFi1,Wi-Fi Hotspot 2,AnotherWifi`
+**Command**: `lap`  
+**Type**: Blocking Reply  
+**Purpose**: Lists all available access points in the vicinity. Comma delimited. This function may be *blocking*, meaning that it may take a significant amount of time to run.  
+**Returns**: `WiFi1,Wi-Fi Hotspot 2,AnotherWifi`
 
 ### Connect to Access Point
 
-Command: `cap <ssid>,<password>`  
-Type: Action  
-Purpose: Connects to an access point with SSID and password. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
-Parameters:
+**Command**: `cap <ssid>,<password>`  
+**Type**: Action  
+**Purpose**: Connects to an access point with SSID and password. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
+**Parameters**:
 
 - `<ssid>`: The SSID of the Wi-Fi access point to connect to
 - `<password>`: The PSK of the Wi-Fi access point to connect to
 
 ### Status of Access Point
 
-Command: `sap`  
-Type: Reply  
-Purpose: Checks if the ESP8266 is properly connected to an access point.  
-Returns: `<S/U/P/N>,<ssid (only if connection is successful)>` based on the connectivity state.
+**Command**: `sap`  
+**Type**: Reply  
+**Purpose**: Checks if the ESP8266 is properly connected to an access point.  
+**Returns**: `<S/U/P/N>,<ssid (only if connection is successful)>` based on the connectivity state.
 
 ### Disconnect from Access Point
 
-Command: `dap`  
-Type: Action  
-Purpose: Disconnects from the currently connected access point.
+**Command**: `dap`  
+**Type**: Action  
+**Purpose**: Disconnects from the currently connected access point.
 
 ## IP and DHCP operations
 
 ### Set DHCP enabled
 
-Command: `sde <T/F>`  
-Type: Action  
-Purpose: Sets whether should DHCP be enabled  
-Parameters:
+**Command**: `sde <T/F>`  
+**Type**: Action  
+**Purpose**: Sets whether should DHCP be enabled  
+**Parameters**:
 
 - `<T/F>`: True or False, whether DHCP should be enabled
 
 ### Get IP
 
-Command: `gip`  
-Type: Blocking Reply  
-Purpose: Gets the current IP address of the module, when connected to Wi-Fi  
-Returns: `0` if there is no IP assigned, IP address if there is an IP
+**Command**: `gip`  
+**Type**: Blocking Reply  
+**Purpose**: Gets the current IP address of the module, when connected to Wi-Fi  
+**Returns**: `0` if there is no IP assigned, IP address if there is an IP
 
 ### Set IP
 
-Command: `sip <ip>,<gateway>,<netmask>`  
-Type: Action  
-Purpose: Sets the IP address, gateway and netmask of the ESP8266, if we're using static IP. DHCP must be disabled prior to setting an IP address manually  
-Parameters:
+**Command**: `sip <ip>,<gateway>,<netmask>`  
+**Type**: Action  
+**Purpose**: Sets the IP address, gateway and netmask of the ESP8266, if we're using static IP. DHCP must be disabled prior to setting an IP address manually  
+**Parameters**:
 
 - `<ip>`: The IP address to set
 - `<gateway>`: The gateway to set
@@ -123,66 +123,81 @@ Parameters:
 
 ### Initiate HTTP Request
 
-Command: `ihr <G/P>,<url>,<content>,<port (optional)>`  
-Type: Action  
-Purpose: Initiates a HTTP request to a URL. This method does not report back on the progress or completion of the request.  
-Parameters:
+**Command**: `ihr <G/P>,<url>,<port (optional)>`  
+**Type**: Action  
+**Purpose**: Initiates a HTTP request to a URL. This method does not report back on the progress or completion of the request.  
+**Parameters**:
 
 - `<G/P>`: GET or POST
 - `<url>`: The full URL, including protocol. Example: `https://fourier.industries/endpoint`
-- `<content>`: The content to send
 - `<port (optional)>`: The port to use. Defaults to 80 if protocol is HTTP and 443 if HTTPS
 
-Returns: A unique identifier or handle that identifies the HTTP request
+**Returns**: A unique identifier or handle that identifies the HTTP request
+
+### Content of HTTP Request
+
+**Command**: `chr <http request handle>,<content>`  
+**Type**: Action  
+**Purpose**: Specifies the contents field of a HTTP request. This is done separately from `ihr` so as to avoid having to use special character escape sequences.  
+**Parameters**:
+
+- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
+- `<content>`: The content of the HTTP request.
+
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
 
 ### Status of HTTP Request
 
-Command: `shr <http request handle>`  
-Type: Reply  
-Purpose: Checks on the status of a HTTP request.  
-Parameters:
+**Command**: `shr <http request handle>`  
+**Type**: Reply  
+**Purpose**: Checks on the status of a HTTP request.  
+**Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
-Returns: `<S/U/P/N>` based on the status of the connection. S -> Success, U -> Unsuccessful, P -> In Progress, N -> No such HTTP request handle
+**Returns**: `<S/U/P/N>` based on the status of the connection. S -> Success, U -> Unsuccessful, P -> In Progress, N -> No such HTTP request handle
 
 ### Get HTTP Response
 
-Command: `ghr <http request handle>,<S/H/C>,<T/F>`  
-Type: Reply/Blocking Reply  
-Purpose: Gets the result of a HTTP request. The request must be completed before attempting to retrieve it.  
-Parameters:
+**Command**: `ghr <http request handle>,<S/H/C>,<T/F>`  
+**Type**: Reply/Blocking Reply  
+**Purpose**: Gets the result of a HTTP request. The request must be completed before attempting to retrieve it.  
+**Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 - `<S/H/C>`: Status, Headers, Content
 - `<T/F>`: True to delete the result, False to keep the result in the ESP8266
 
-Returns: WIP
+**Returns**: No reply if the HTTP request handle is invalid, or that the request has not yet been completed or has failed. Replies with the status (e.g. `200`) if second parameter is `S`, replies with all the headers if second parameter is `H` and replies with the content of the response if second parameter is `C`.
 
 ### Get HTTP Response Content as JSON
 
-Command: `jhr <http request handle>,<json map>`  
-Type: Reply/Blocking Reply  
-Purpose: Gets parts of the HTTP response as JSON  
-Parameters:
+**Command**: `jhr <http request handle>,<json map>`  
+**Type**: Reply/Blocking Reply  
+**Purpose**: Gets parts of the HTTP response as JSON  
+**Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 - `<json map>`: WIP
 
+**Returns**: WIP
+
 ### Purge HTTP Response
 
-Command: `phr <http request handle>`  
-Type: Reply  
-Purpose: Frees the RAM taken by a HTTP response on the ESP8266 while freeing up the handle as well to be used by other HTTP requests  
-Parameters:
+**Command**: `phr <http request handle>`  
+**Type**: Reply  
+**Purpose**: Frees the RAM taken by a HTTP response on the ESP8266 while freeing up the handle as well to be used by other HTTP requests  
+**Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
+**Returns**: `\r\n` if command was executed successfully
+
 ### Terminate HTTP request
 
-Command: `thr <http request handle>`  
-Type: Action  
-Purpose: Terminates a HTTP request.  
-Parameters:
+**Command**: `thr <http request handle>`  
+**Type**: Action  
+**Purpose**: Terminates a HTTP request.  
+**Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
