@@ -39,7 +39,7 @@
 #include "wifi.h"
 
 /* TODO: Comment out the definition if in production!! */
-#define DEVELOPMENT
+// #define DEVELOPMENT
 
 /******************************************************************************
  *                                                                            *
@@ -149,7 +149,7 @@ enum mgos_app_init_result mgos_app_init(void)
 {
     /* Enable or disable logging based on the build environment */
 #ifdef DEVELOPMENT
-    cs_log_set_level(LL_INFO); /* Enable logging, but not too verbose */
+    cs_log_set_level(LL_WARN); /* Enable logging, but not too verbose */
 #else
     mgos_set_stdout_uart(-1);  /* Disables stdout */
     mgos_set_stderr_uart(-1);  /* Disables stderr */

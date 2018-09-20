@@ -2,6 +2,13 @@
 
 #include "constants.h"
 
+int compare_larger_rssi(const void *s1, const void *s2)
+{
+  struct mgos_wifi_scan_result *e1 = (struct mgos_wifi_scan_result *)s1;
+  struct mgos_wifi_scan_result *e2 = (struct mgos_wifi_scan_result *)s2;
+  return e2->rssi - e1->rssi;
+}
+
 /******************************************************************************
  *                                                                            *
  * FUNCTION NAME: wifi_cb                                                     *
@@ -51,11 +58,15 @@ void wifi_cb(int ev, void *evd, void *arg)
  *****************************************************************************/
 void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg)
 {
-    mgos_uart_printf(UART_NO, "WiFi scan result: SSIDs %d, arg %p, results:", n, arg);
+    qsort(res, n, sizeof(struct mgos_wifi_scan_result), compare_larger_rssi); /* Sort by RSSI descending */
+    mgos_uart_printf(UART_NO, "%d hotspots detected: ", n, arg);
     for (int i = 0; i < n; i++)
     {
-        mgos_uart_printf(UART_NO, "  SSID: %-32s, auth: %2d, channel: %2d, RSSI: %2d",
-                      res[i].ssid, res[i].auth_mode, res[i].channel, res[i].rssi);
+        if (i > 0)
+        {
+            mgos_uart_printf(UART_NO, ",");
+        }
+        mgos_uart_printf(UART_NO, "%s", res[i].ssid);
     }
-    mgos_uart_printf(UART_NO, "WiFi scan completed\r\n");
+    mgos_uart_printf(UART_NO, "\r\n");
 }
