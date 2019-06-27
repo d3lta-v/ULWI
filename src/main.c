@@ -109,28 +109,75 @@ static void uart_dispatcher(int uart_no, void *arg)
     /* The sample line comparisons here are just for illustration purposes */
 
     /* Phase I: basic command sanitisation */
-    if (line_length < (3 + 1)) /* Keep into account the null character */
+    if (line_length < (3 + 1)) /* Keep into account the null character for termination */
     {
         mgos_uart_printf(UART_NO, "short\r\n");
     }
     else
     {
-        if (mg_strncmp(line, COMMAND_NOP, 3) == 0) /* Note that 0 indicates match */
+        /* Phase II: string comparison to sort out the commands */
+        if (mg_str_starts_with(line, COMMAND_NOP) && line.len == 3)
         {
             mgos_uart_printf(UART_NO, "\r\n");
         }
-        else if (mg_strncmp(line, COMMAND_VER, 3) == 0)
+        else if (mg_str_starts_with(line, COMMAND_VER) && line.len == 3)
         {
             mgos_uart_printf(UART_NO, "v1.0-alpha1\r\n");
         } 
-        else if (mg_strncmp(line, COMMAND_RST, 3) == 0)
+        else if (mg_str_starts_with(line, COMMAND_RST) && line.len == 3)
         {
             mgos_system_restart();
         }
-        else if (mg_strncmp(line, COMMAND_LAP, 3) == 0)
+        else if (mg_str_starts_with(line, COMMAND_LAP) && line.len == 3)
         {
             mgos_wifi_scan(wifi_scan_cb, NULL);
             mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, wifi_cb, NULL);
+        }
+        else if (mg_str_starts_with(line, COMMAND_CAP) && line.len > 4)
+        {
+            const size_t parameter_len = line.len - 4;
+            char parameter_c_str[128] = {0};
+            strncpy(parameter_c_str, line.p+4, parameter_len);
+
+            // Variables to be passed into the function, these are compile time functions
+            const int max_params = 2;
+            const int max_param_len = 64;
+
+            const char delimiter[2] = "\x1f"; // ASCII unit separator character as delimiter
+            char *token = strtok(parameter_c_str, delimiter);
+            char parameters[max_params][max_param_len];
+
+            int max_param_counter = 0;
+
+            while (token != NULL)
+            {
+                if (max_param_counter < max_params)
+                {
+                    // only copy the necessary number of parameters into the char* array
+                    strncpy(parameters[max_param_counter], token, max_param_len);
+                }
+                token = strtok(NULL, delimiter);
+                max_param_counter++;
+            }
+
+            bool valid_parameter_count = max_param_counter == max_params;
+
+            if (valid_parameter_count)
+            {
+                mgos_uart_printf(UART_NO, "ssid: %s, password: %s\r\n", parameters[0], parameters[1]);      
+                // begin wifi connection
+                // const struct mgos_config_wifi_sta sta_config;
+                // sta_config.enable = true;
+                // if (!mgos_wifi_setup_sta(&sta_config))
+                // {
+                //     LOG(LL_ERROR, ("Wifi STA setup failed"));
+                // }
+            }
+            else
+            {
+                // user entered an invalid number of parameters
+                mgos_uart_printf(UART_NO, "invalid\r\n");
+            }
         }
         else
         {
