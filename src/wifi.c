@@ -59,7 +59,6 @@ void wifi_cb(int ev, void *evd, void *arg)
 void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg)
 {
     qsort(res, n, sizeof(struct mgos_wifi_scan_result), compare_larger_rssi); /* Sort by RSSI descending */
-    mgos_uart_printf(UART_NO, "%d hotspots detected: ", n, arg);
     for (int i = 0; i < n; i++)
     {
         if (i > 0)
@@ -69,4 +68,5 @@ void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg)
         mgos_uart_printf(UART_NO, "%s", res[i].ssid);
     }
     mgos_uart_printf(UART_NO, "\r\n");
+    (void)arg;
 }
