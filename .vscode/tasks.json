@@ -5,8 +5,10 @@
     "tasks": [
         {
             "label": "build",
+            "type": "shell",
             "group": "build",
             "args": [
+                "build",
                 "--platform",
                 "esp8266",
             ],
@@ -28,8 +30,10 @@
         },
         {
             "label": "flash",
+            "type": "shell",
             "group": "build",
             "args": [
+                "flash",
                 "--esp-flash-params",
                 "qio,8m,40m" // Flash with QIO instead of DIO, with 1Mbyte flash. Remove this line if using default
             ],
@@ -37,8 +41,9 @@
         },
         {
             "label": "console",
+            "type": "shell",
             "group": "build",
-            "args": [],
+            "args": ["console"],
             "problemMatcher": []
         }
     ]
