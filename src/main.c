@@ -171,7 +171,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             
             if (param_len == 2)
             {
-                // start wifi
+                /* Initiate wifi */
                 const struct mgos_config_wifi_sta wifi_config = { true, result[0], result[1] };
                 mgos_wifi_setup_sta(&wifi_config);
             }
@@ -193,9 +193,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "P\r\n");
                 break;
             case MGOS_WIFI_CONNECTED:
-                //TODO: need to implement differentiation between connected and IP acquired,
-                //      as some Wi-Fi environments do NOT use DHCP
-                // this condition is fallthrough
+                /* TODO: need to implement differentiation between connected and IP acquired,
+                         as some Wi-Fi environments do NOT use DHCP */
+                /* this condition is fallthrough */
             case MGOS_WIFI_IP_ACQUIRED:
                 if (ssid)
                 {
@@ -203,8 +203,10 @@ static void uart_dispatcher(int uart_no, void *arg)
                 }
                 else
                 {
-                    mgos_uart_printf(UART_NO, "U\r\n", ssid);
-                    LOG(LL_ERROR, ("Wifi connected but SSID is null!"));
+                    /* This case occurs when Wi-Fi connection was JUST established and
+                       might not constitute an error */
+                    mgos_uart_printf(UART_NO, "P\r\n", ssid);
+                    LOG(LL_DEBUG, ("Wifi IP acquired but SSID is null"));
                 }
                 break;
             default:
