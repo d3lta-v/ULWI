@@ -214,6 +214,20 @@ static void uart_dispatcher(int uart_no, void *arg)
                 break;
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_DAP) && line.len == 3)
+        {
+            const char *ssid = mgos_wifi_get_connected_ssid();
+            if (ssid)
+            {
+                LOG(LL_DEBUG, ("attempting disconnect from wifi"));
+                const struct mgos_config_wifi_sta wifi_config = { false };
+                mgos_wifi_setup_sta(&wifi_config);
+            }
+            else
+            {
+                LOG(LL_DEBUG, ("not attempting disconnect from wifi"));
+            }
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");
