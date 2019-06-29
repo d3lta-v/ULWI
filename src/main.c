@@ -36,10 +36,11 @@
 #include "mgos.h"
 
 #include "constants.h"
+#include "common.h"
 #include "wifi.h"
 
 /* TODO: Comment out the definition if in production!! */
-// #define DEVELOPMENT
+#define DEVELOPMENT
 
 /******************************************************************************
  *                                                                            *
@@ -96,9 +97,9 @@ static void uart_dispatcher(int uart_no, void *arg)
     }
     else
     {
-        /* CR not found, command is incomplete */
+        /* CR not found, command might be incomplete, but might be newline in content */
 #ifdef DEVELOPMENT
-        mgos_uart_printf(UART_NO, "WARNING: Command is incomplete! \r\n");
+        LOG(LL_WARN, ("Command might be incomplete!"));
 #endif
         return;
     }
@@ -139,43 +140,18 @@ static void uart_dispatcher(int uart_no, void *arg)
             char parameter_c_str[128] = {0};
             strncpy(parameter_c_str, line.p+4, parameter_len);
 
-            // Variables to be passed into the function, these are compile time functions
             const int max_params = 2;
             const int max_param_len = 64;
+            char result[max_params][max_param_len];
 
-            const char delimiter[2] = "\x1f"; // ASCII unit separator character as delimiter
-            char *token = strtok(parameter_c_str, delimiter);
-            char parameters[max_params][max_param_len];
-
-            int max_param_counter = 0;
-
-            while (token != NULL)
+            const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
+            
+            if (param_len == 2)
             {
-                if (max_param_counter < max_params)
-                {
-                    // only copy the necessary number of parameters into the char* array
-                    strncpy(parameters[max_param_counter], token, max_param_len);
-                }
-                token = strtok(NULL, delimiter);
-                max_param_counter++;
-            }
-
-            bool valid_parameter_count = max_param_counter == max_params;
-
-            if (valid_parameter_count)
-            {
-                mgos_uart_printf(UART_NO, "ssid: %s, password: %s\r\n", parameters[0], parameters[1]);      
-                // begin wifi connection
-                // const struct mgos_config_wifi_sta sta_config;
-                // sta_config.enable = true;
-                // if (!mgos_wifi_setup_sta(&sta_config))
-                // {
-                //     LOG(LL_ERROR, ("Wifi STA setup failed"));
-                // }
+                mgos_uart_printf(UART_NO, "ssid: %s, password: %s\r\n", result[0], result[1]);
             }
             else
             {
-                // user entered an invalid number of parameters
                 mgos_uart_printf(UART_NO, "invalid\r\n");
             }
         }
