@@ -42,6 +42,30 @@
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
 
+#ifdef DEVELOPMENT
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: timer_cb                                                    *
+ *                                                                            *
+ * PURPOSE: A simple timer that prints debug information regarding the        *
+ *          current state of the system periodically                          *
+ *                                                                            *
+ * ARGUMENTS: N/A                                                             *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
+static void timer_cb(void *arg) {
+    static bool s_tick_tock = false;
+    LOG(LL_INFO,
+        ("uptime: %.2lf, RAM: %lu, %lu free",
+        mgos_uptime(), (unsigned long) mgos_get_heap_size(),
+        (unsigned long) mgos_get_free_heap_size()));
+    s_tick_tock = !s_tick_tock;
+    (void) arg;
+}
+#endif /* DEVELOPMENT */
+
 /******************************************************************************
  *                                                                            *
  * FUNCTION NAME: uart_dispatcher                                             *
@@ -159,7 +183,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         }
         else if (mg_str_starts_with(line, COMMAND_SAP) && line.len == 3)
         {
-            enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
+            const enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
             switch (wifi_status)
             {
             case MGOS_WIFI_DISCONNECTED:
@@ -195,7 +219,8 @@ enum mgos_app_init_result mgos_app_init(void)
 {
     /* Enable or disable logging based on the build environment */
 #ifdef DEVELOPMENT
-    cs_log_set_level(LL_WARN); /* Enable logging, but not too verbose */
+    mgos_set_timer(10000, MGOS_TIMER_REPEAT, timer_cb, NULL); /* Enable debug timer */
+    cs_log_set_level(LL_INFO); /* Enable logging, but not too verbose */
 #else
     mgos_set_stdout_uart(-1);  /* Disables stdout */
     mgos_set_stderr_uart(-1);  /* Disables stderr */
