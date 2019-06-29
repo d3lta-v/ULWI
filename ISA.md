@@ -6,6 +6,8 @@ If you are confused about what this instruction set is supposed to do, please re
 
 All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To process messages involving multiple lines, please use UNIX style line endings (`\n`).
 
+In addition, all parameters are delimited with the ASCII Unit Separator control character (0x1F) to avoid excessive use of escape characters or sequences. **This character is represented by the vertical bar character (|) in the rest of this manual.**
+
 The instruction set is inspired by CISC instruction sets such as x86, in order to provide as much functionality as possible, making programming easier for the master side.
 
 Any instructions that are synchronous in nature is explicitly marked so. All attempts have been made to make the program flow as asynchronous as possible, but there are still certain instructions that are fundamentally synchronous and requires waiting.
@@ -65,11 +67,11 @@ HTTP method types:
 **Command**: `lap`  
 **Type**: Blocking Reply  
 **Purpose**: Lists all available access points in the vicinity. Comma delimited. This function may be *blocking*, meaning that it may take a significant amount of time to run.  
-**Returns**: `WiFi1,Wi-Fi Hotspot 2,AnotherWifi`
+**Returns**: `WiFi1|Wi-Fi Hotspot 2|AnotherWifi`
 
 ### Connect to Access Point
 
-**Command**: `cap <ssid>,<password>`  
+**Command**: `cap <ssid>|<password>`  
 **Type**: Action  
 **Purpose**: Connects to an access point with SSID and password. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
 **Parameters**:
@@ -110,7 +112,7 @@ HTTP method types:
 
 ### Set IP
 
-**Command**: `sip <ip>,<gateway>,<netmask>`  
+**Command**: `sip <ip>|<gateway>|<netmask>`  
 **Type**: Action  
 **Purpose**: Sets the IP address, gateway and netmask of the ESP8266, if we're using static IP. DHCP must be disabled prior to setting an IP address manually  
 **Parameters**:
@@ -123,7 +125,7 @@ HTTP method types:
 
 ### Initiate HTTP Request
 
-**Command**: `ihr <G/P>,<url>,<port (optional)>`  
+**Command**: `ihr <G/P>|<url>|<port (optional)>`  
 **Type**: Action  
 **Purpose**: Initiates a HTTP request to a URL. This method does not report back on the progress or completion of the request.  
 **Parameters**:
@@ -136,7 +138,7 @@ HTTP method types:
 
 ### Content of HTTP Request
 
-**Command**: `chr <http request handle>,<content>`  
+**Command**: `chr <http request handle>|<content>`  
 **Type**: Action  
 **Purpose**: Specifies the contents field of a HTTP request. This is done separately from `ihr` so as to avoid having to use special character escape sequences.  
 **Parameters**:
@@ -159,7 +161,7 @@ HTTP method types:
 
 ### Get HTTP Response
 
-**Command**: `ghr <http request handle>,<S/H/C>,<T/F>`  
+**Command**: `ghr <http request handle>|<S/H/C>|<T/F>`  
 **Type**: Reply/Blocking Reply  
 **Purpose**: Gets the result of a HTTP request. The request must be completed before attempting to retrieve it.  
 **Parameters**:
@@ -172,7 +174,7 @@ HTTP method types:
 
 ### Get HTTP Response Content as JSON
 
-**Command**: `jhr <http request handle>,<json map>`  
+**Command**: `jhr <http request handle>|<json map>`  
 **Type**: Reply/Blocking Reply  
 **Purpose**: Gets parts of the HTTP response as JSON  
 **Parameters**:

@@ -149,18 +149,41 @@ static void uart_dispatcher(int uart_no, void *arg)
             if (param_len == 2)
             {
                 mgos_uart_printf(UART_NO, "ssid: %s, password: %s\r\n", result[0], result[1]);
+                // start wifi
+
             }
             else
             {
                 mgos_uart_printf(UART_NO, "invalid\r\n");
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_SAP) && line.len == 3)
+        {
+            enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
+            switch (wifi_status)
+            {
+            case MGOS_WIFI_DISCONNECTED:
+                mgos_uart_printf(UART_NO, "N\r\n");
+                break;
+            case MGOS_WIFI_CONNECTING:
+                mgos_uart_printf(UART_NO, "P\r\n");
+                break;
+            case MGOS_WIFI_CONNECTED:
+                //TODO: implement SSID readback
+                mgos_uart_printf(UART_NO, "S\r\n");
+                break;
+            case MGOS_WIFI_IP_ACQUIRED:
+                //TODO: implement SSID readback
+                mgos_uart_printf(UART_NO, "S\r\n");
+                break;
+            default:
+                mgos_uart_printf(UART_NO, "U\r\n");
+                break;
+            }
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");
-            // mgos_uart_printf(UART_NO,
-            //                  "Invalid command: '%.*s'.\r\n",
-            //                  (int)line.len, line.p);
         }
     }
 
