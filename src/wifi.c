@@ -27,15 +27,42 @@ int compare_larger_rssi(const void *s1, const void *s2)
  * RETURNS: none                                                              *
  *                                                                            *
  *****************************************************************************/
-void wifi_cb(int ev, void *evd, void *arg)
-{
-    const struct mgos_net_event_data *ev_data =
-        (const struct mgos_net_event_data *)evd;
-    if (ev_data->if_type != MGOS_NET_IF_TYPE_WIFI)
-        return;
-    // LOG(LL_INFO, ("WiFi change event: %d, arg %p", (int)ev, arg));
-    (void)&ev;
-    (void)arg;
+void wifi_cb(int ev, void *evd, void *arg) {
+    switch (ev) {
+    case MGOS_WIFI_EV_STA_DISCONNECTED: {
+        struct mgos_wifi_sta_disconnected_arg *da =
+            (struct mgos_wifi_sta_disconnected_arg *) evd;
+        LOG(LL_INFO, ("WiFi STA disconnected, reason %d", da->reason));
+        break;
+    }
+    case MGOS_WIFI_EV_STA_CONNECTING:
+        LOG(LL_INFO, ("WiFi STA connecting %p", arg));
+        break;
+    case MGOS_WIFI_EV_STA_CONNECTED:
+        LOG(LL_INFO, ("WiFi STA connected %p", arg));
+        break;
+    case MGOS_WIFI_EV_STA_IP_ACQUIRED:
+        LOG(LL_INFO, ("WiFi STA IP acquired %p", arg));
+        break;
+    case MGOS_WIFI_EV_AP_STA_CONNECTED: {
+        struct mgos_wifi_ap_sta_connected_arg *aa =
+            (struct mgos_wifi_ap_sta_connected_arg *) evd;
+        LOG(LL_INFO, ("WiFi AP STA connected MAC %02x:%02x:%02x:%02x:%02x:%02x",
+                    aa->mac[0], aa->mac[1], aa->mac[2], aa->mac[3], aa->mac[4],
+                    aa->mac[5]));
+        break;
+    }
+    case MGOS_WIFI_EV_AP_STA_DISCONNECTED: {
+        struct mgos_wifi_ap_sta_disconnected_arg *aa =
+            (struct mgos_wifi_ap_sta_disconnected_arg *) evd;
+        LOG(LL_INFO,
+            ("WiFi AP STA disconnected MAC %02x:%02x:%02x:%02x:%02x:%02x",
+            aa->mac[0], aa->mac[1], aa->mac[2], aa->mac[3], aa->mac[4],
+            aa->mac[5]));
+        break;
+    }
+    }
+    (void) arg;
 }
 
 /******************************************************************************

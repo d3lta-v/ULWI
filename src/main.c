@@ -156,25 +156,24 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_LAP) && line.len == 3)
         {
             mgos_wifi_scan(wifi_scan_cb, NULL);
-            mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, wifi_cb, NULL);
         }
         else if (mg_str_starts_with(line, COMMAND_CAP) && line.len > 4)
         {
             const size_t parameter_len = line.len - 4;
-            char parameter_c_str[128] = {0};
+            char parameter_c_str[130] = {0}; /* 128 + 2 null termination chars */
             strncpy(parameter_c_str, line.p+4, parameter_len);
 
             const int max_params = 2;
-            const int max_param_len = 64;
+            const int max_param_len = 65;
             char result[max_params][max_param_len];
 
             const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
             
             if (param_len == 2)
             {
-                mgos_uart_printf(UART_NO, "ssid: %s, password: %s\r\n", result[0], result[1]);
                 // start wifi
-
+                const struct mgos_config_wifi_sta wifi_config = { true, result[0], result[1] };
+                mgos_wifi_setup_sta(&wifi_config);
             }
             else
             {
@@ -184,6 +183,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_SAP) && line.len == 3)
         {
             const enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
+            const char *ssid = mgos_wifi_get_connected_ssid();
             switch (wifi_status)
             {
             case MGOS_WIFI_DISCONNECTED:
@@ -193,12 +193,19 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "P\r\n");
                 break;
             case MGOS_WIFI_CONNECTED:
-                //TODO: implement SSID readback
-                mgos_uart_printf(UART_NO, "S\r\n");
-                break;
+                //TODO: need to implement differentiation between connected and IP acquired,
+                //      as some Wi-Fi environments do NOT use DHCP
+                // this condition is fallthrough
             case MGOS_WIFI_IP_ACQUIRED:
-                //TODO: implement SSID readback
-                mgos_uart_printf(UART_NO, "S\r\n");
+                if (ssid)
+                {
+                    mgos_uart_printf(UART_NO, "S\x1f%s\r\n", ssid);
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "U\r\n", ssid);
+                    LOG(LL_ERROR, ("Wifi connected but SSID is null!"));
+                }
                 break;
             default:
                 mgos_uart_printf(UART_NO, "U\r\n");
@@ -247,6 +254,9 @@ enum mgos_app_init_result mgos_app_init(void)
      * buffer or space available in the output buffer */
     mgos_uart_set_dispatcher(UART_NO, uart_dispatcher, NULL /* arg */);
     mgos_uart_set_rx_enabled(UART_NO, true); /* Enable UART receiver */
+
+    /* Setup Wi-Fi event handlers */
+    mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, wifi_cb, NULL);
 
     return MGOS_APP_INIT_SUCCESS;
 }
