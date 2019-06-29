@@ -11,13 +11,12 @@
                 "build",
                 "--platform",
                 "esp8266",
+                "--local",
+                "--verbose"
             ],
             "problemMatcher": {
                 "owner": "cpp",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ],
+                "fileLocation": ["absolute"],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
                     "file": 1,

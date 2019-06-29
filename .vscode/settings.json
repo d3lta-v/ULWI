@@ -1,5 +1,5 @@
 {
-    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "C_Cpp.intelliSenseEngine": "Default",
     "files.associations": {
         "mgos.h": "c",
         "mgos_gpio.h": "c",

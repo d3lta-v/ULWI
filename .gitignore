@@ -31,3 +31,6 @@ build
 
 # Deps folder
 deps
+
+# Parts of the .vscode folder
+.vscode/ipch
