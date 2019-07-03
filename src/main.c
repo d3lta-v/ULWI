@@ -160,10 +160,10 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_CAP) && line.len > 4)
         {
             const size_t parameter_len = line.len - 4;
-            char parameter_c_str[130] = {0}; /* 128 + 2 null termination chars */
+            char parameter_c_str[177] = {0}; /* 128 + 16*3 + null termination char */
             strncpy(parameter_c_str, line.p+4, parameter_len);
 
-            const int max_params = 2;
+            const int max_params = 5;
             const int max_param_len = 65;
             char result[max_params][max_param_len];
 
@@ -171,8 +171,25 @@ static void uart_dispatcher(int uart_no, void *arg)
             
             if (param_len == 2)
             {
-                /* Initiate wifi */
-                const struct mgos_config_wifi_sta wifi_config = { true, result[0], result[1] };
+                const struct mgos_config_wifi_sta wifi_config = 
+                { 
+                    .enable = true, 
+                    .ssid = result[0], 
+                    .pass = result[1]
+                };
+                mgos_wifi_setup_sta(&wifi_config);
+            }
+            else if (param_len == 5)
+            {
+                const struct mgos_config_wifi_sta wifi_config = 
+                { 
+                    .enable = true, 
+                    .ssid = result[0], 
+                    .pass = result[1],
+                    .ip = result[2],
+                    .gw = result[3],
+                    .netmask = result[4]
+                };
                 mgos_wifi_setup_sta(&wifi_config);
             }
             else
