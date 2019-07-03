@@ -228,6 +228,15 @@ static void uart_dispatcher(int uart_no, void *arg)
                 LOG(LL_DEBUG, ("not attempting disconnect from wifi"));
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_GIP) && line.len == 3)
+        {
+            // get IP
+            struct mgos_net_ip_info ip_information;
+            mgos_net_get_ip_info(MGOS_NET_IF_TYPE_WIFI, MGOS_NET_IF_WIFI_STA, &ip_information);
+            char ip[16];
+            mgos_net_ip_to_str(&ip_information.ip, ip);
+            mgos_uart_printf(UART_NO, "%s", ip);
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");

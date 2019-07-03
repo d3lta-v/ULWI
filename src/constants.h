@@ -32,4 +32,6 @@ static const struct mg_str COMMAND_CAP = MG_MK_STR("cap");
 static const struct mg_str COMMAND_SAP = MG_MK_STR("sap");
 static const struct mg_str COMMAND_DAP = MG_MK_STR("dap");
 
+static const struct mg_str COMMAND_GIP = MG_MK_STR("gip");
+
 #endif
