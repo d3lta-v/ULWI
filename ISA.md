@@ -71,13 +71,16 @@ HTTP method types:
 
 ### Connect to Access Point
 
-**Command**: `cap <ssid>|<password>`  
+**Command**: `cap <ssid>|<password>(|<ip>|<gw>|<netmask>)`  
 **Type**: Action  
-**Purpose**: Connects to an access point with SSID and password. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
+**Purpose**: Connects to an access point with SSID and password. Optionally, one can pass in the IP, gateway and netmask if the access point uses static IP allocation. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
 **Parameters**:
 
 - `<ssid>`: The SSID of the Wi-Fi access point to connect to
 - `<password>`: The PSK of the Wi-Fi access point to connect to
+- `<ip>` (optional): The desired IP address of the current device
+- `<gw>` (optional): The gateway IP of the network
+- `<netmask>` (optional): The net mask of the network
 
 ### Status of Access Point
 
@@ -109,17 +112,6 @@ HTTP method types:
 **Type**: Blocking Reply  
 **Purpose**: Gets the current IP address of the module, when connected to Wi-Fi  
 **Returns**: `0` if there is no IP assigned, IP address if there is an IP
-
-### Set IP
-
-**Command**: `sip <ip>|<gateway>|<netmask>`  
-**Type**: Action  
-**Purpose**: Sets the IP address, gateway and netmask of the ESP8266, if we're using static IP. DHCP must be disabled prior to setting an IP address manually  
-**Parameters**:
-
-- `<ip>`: The IP address to set
-- `<gateway>`: The gateway to set
-- `<netmask>`: The network mask to set
 
 ## HTTP operations
 
