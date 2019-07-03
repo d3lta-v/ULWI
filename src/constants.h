@@ -26,6 +26,7 @@
 static const struct mg_str COMMAND_NOP = MG_MK_STR("nop");
 static const struct mg_str COMMAND_VER = MG_MK_STR("ver");
 static const struct mg_str COMMAND_RST = MG_MK_STR("rst");
+static const struct mg_str COMMAND_OTA = MG_MK_STR("ota");
 
 static const struct mg_str COMMAND_LAP = MG_MK_STR("lap");
 static const struct mg_str COMMAND_CAP = MG_MK_STR("cap");

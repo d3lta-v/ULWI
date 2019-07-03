@@ -38,6 +38,7 @@
 #include "constants.h"
 #include "common.h"
 #include "wifi.h"
+#include "mgos_ota_http_client.h"
 
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
@@ -152,6 +153,17 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_RST) && line.len == 3)
         {
             mgos_system_restart();
+        }
+        else if (mg_str_starts_with(line, COMMAND_OTA) && line.len == 3)
+        {
+            const char url[] = "https://github.com/d3lta-v/ULWI/raw/master/fw.zip";
+            const struct mgos_ota_opts options = 
+            {
+                .timeout = 60,
+                .commit_timeout = 20,
+                .ignore_same_version = true
+            };
+            mgos_ota_http_start(url, &options);
         }
         else if (mg_str_starts_with(line, COMMAND_LAP) && line.len == 3)
         {
