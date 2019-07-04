@@ -1,5 +1,4 @@
 #include "common.h"
-#include "mgos_ota_http_client.h"
 
 static const char delimiter[] = "\x1f";
 
@@ -40,27 +39,4 @@ int split_parameter_string(char *target_str, const int max_params, const int max
     }
 
     return max_param_counter;
-}
-
-/******************************************************************************
- *                                                                            *
- * FUNCTION NAME: ota_update                                                  *
- *                                                                            *
- * PURPOSE: Performs an OTA update on the current device                      *
- *                                                                            *
- * ARGUMENTS: none                                                            *
- *                                                                            *
- * RETURNS: none                                                              *
- *                                                                            *
- *****************************************************************************/
-void ota_update(void)
-{
-    const char url[] = "https://github.com/d3lta-v/ULWI/raw/master/fw.zip";
-    const struct mgos_ota_opts options = 
-    {
-        .timeout = 60,
-        .commit_timeout = 20,
-        .ignore_same_version = true
-    };
-    mgos_ota_http_start(url, &options);
 }

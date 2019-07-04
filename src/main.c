@@ -153,11 +153,6 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             mgos_system_restart();
         }
-        else if (mg_str_starts_with(line, COMMAND_OTA) && line.len == 3)
-        {
-            mgos_uart_printf(UART_NO, "\r\n");
-            ota_update();
-        }
         else if (mg_str_starts_with(line, COMMAND_LAP) && line.len == 3)
         {
             mgos_wifi_scan(wifi_scan_cb, NULL);

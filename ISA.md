@@ -60,12 +60,6 @@ HTTP method types:
 **Type**: Blocking Reply  
 **Purpose**: Performs a software reset of the module.
 
-### OTA update
-
-**Command**: `ota`  
-**Type**: Blocking Reply  
-**Purpose**: Performs an automated OTA update
-
 ## Wi-Fi operations
 
 ### List Access Points

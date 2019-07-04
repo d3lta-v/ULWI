@@ -18,6 +18,5 @@
 #include "mgos.h"
 
 int split_parameter_string(char *target_str, const int max_params, const int max_param_len, char result[max_params][max_param_len]);
-void ota_update(void);
 
 #endif
