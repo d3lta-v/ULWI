@@ -257,7 +257,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             mgos_net_get_ip_info(MGOS_NET_IF_TYPE_WIFI, MGOS_NET_IF_WIFI_STA, &ip_information);
             char ip[16];
             mgos_net_ip_to_str(&ip_information.ip, ip);
-            mgos_uart_printf(UART_NO, "%s", ip);
+            mgos_uart_printf(UART_NO, "%s\r\n", ip);
         }
         else
         {
