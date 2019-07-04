@@ -254,6 +254,58 @@ static void uart_dispatcher(int uart_no, void *arg)
             mgos_net_ip_to_str(&ip_information.ip, ip);
             mgos_uart_printf(UART_NO, "%s\r\n", ip);
         }
+        else if (mg_str_starts_with(line, COMMAND_IHR) && line.len > 4)
+        {
+            // split up Get/Post, URL and port (3 parameters)
+
+            const size_t parameter_len = line.len - 4;
+            if (parameter_len < 266)
+            {
+                char parameter_c_str[265] = {0}; /* 1 (Get/Post) + 255 (URL length) + 5 (port) + 3 null termination */
+                strncpy(parameter_c_str, line.p+4, parameter_len);
+
+                /* initialise individual parameter variables */
+                char request_type[2];
+                char url[256];
+                char port[6];
+
+                char *token = strtok(parameter_c_str, delimiter);
+                int param_counter = 0;
+                while (token != NULL && param_counter < 3)
+                {
+                    switch (param_counter)
+                    {
+                    case 0:
+                        strncpy(request_type, token, 2);
+                    case 1:
+                        strncpy(url, token, 256);
+                    case 2:
+                        strncpy(port, token, 6);
+                    }
+                    // strncpy(result[param_counter], token, max_param_len);
+                    token = strtok(NULL, delimiter);
+                    param_counter++;
+                }
+
+                /* force null termination on all strings to prevent overflow */
+                request_type[1] = '\0';
+                url[255] = '\0';
+                port[5] = '\0';
+
+                if (param_counter == 3)
+                {
+                    mgos_uart_printf(UART_NO, "request type: %s, url: %s, port: %s\r\n", request_type, url, port);
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "short\r\n");
+                }
+            }
+            else
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");

@@ -23,6 +23,8 @@
 
 #define UART_NO 0
 
+static const char delimiter[] = "\x1f";
+
 static const struct mg_str COMMAND_NOP = MG_MK_STR("nop");
 static const struct mg_str COMMAND_VER = MG_MK_STR("ver");
 static const struct mg_str COMMAND_RST = MG_MK_STR("rst");
@@ -34,5 +36,7 @@ static const struct mg_str COMMAND_SAP = MG_MK_STR("sap");
 static const struct mg_str COMMAND_DAP = MG_MK_STR("dap");
 
 static const struct mg_str COMMAND_GIP = MG_MK_STR("gip");
+
+static const struct mg_str COMMAND_IHR = MG_MK_STR("ihr");
 
 #endif

@@ -1,6 +1,5 @@
 #include "common.h"
-
-static const char delimiter[] = "\x1f";
+#include "constants.h"
 
 /******************************************************************************
  *                                                                            *
