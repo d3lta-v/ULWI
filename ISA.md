@@ -117,34 +117,24 @@ HTTP method types:
 
 ### Initiate HTTP Request
 
-**Command**: `ihr <G/P>|<url>|<port (optional)>`  
+**Command**: `ihr <G/P>|<url>|<parameters>|<content>|<headers>`  
 **Type**: Action  
-**Purpose**: Initiates a HTTP request to a URL. This method does not report back on the progress or completion of the request.  
+**Purpose**: Initiates a HTTP request to a URL with all of the required parameters. If any of the fields are empty, simply skip over said field. A command may look like this without parameters, content or headers: `ihr G|https://fourier.industries|||`
 **Parameters**:
 
 - `<G/P>`: GET or POST
-- `<url>`: The full URL, including protocol. Example: `https://fourier.industries/endpoint`
-- `<port (optional)>`: The port to use. Defaults to 80 if protocol is HTTP and 443 if HTTPS
+- `<url>`: The full URL, including protocol. Example: `https://fourier.industries/endpoint/`
+- `<parameters>`: Parameters to send to the server. Example: `var_1=value1&var_1=value2`
+- `<content>`: The content to send.
+- `<headers>`: HTTP headers to send.
 
-**Returns**: A unique identifier or handle that identifies the HTTP request
-
-### Content of HTTP Request
-
-**Command**: `chr <http request handle>|<content>`  
-**Type**: Action  
-**Purpose**: Specifies the contents field of a HTTP request. This is done separately from `ihr` so as to avoid having to use special character escape sequences.  
-**Parameters**:
-
-- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
-- `<content>`: The content of the HTTP request.
-
-**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
+**Returns**: A unique identifier or handle that identifies the HTTP request, or `U` if it failed to create the handle
 
 ### Status of HTTP Request
 
 **Command**: `shr <http request handle>`  
 **Type**: Reply  
-**Purpose**: Checks on the status of a HTTP request.  
+**Purpose**: Checks on the status of a HTTP request. This is different from the HTTP status code (e.g. 200, 404, 500), which will be reflected by the `ghr` command.  
 **Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
