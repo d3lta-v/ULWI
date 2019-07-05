@@ -265,8 +265,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
                 /* initialise individual parameter variables */
-                char request_type[2];
-                char url[256];
+                char request = '\0';
+                // char url[256];
+                struct mg_str url;
                 char port[6];
 
                 char *token = strtok(parameter_c_str, delimiter);
@@ -276,9 +277,10 @@ static void uart_dispatcher(int uart_no, void *arg)
                     switch (param_counter)
                     {
                     case 0:
-                        strncpy(request_type, token, 2);
+                        request = token[0];
                     case 1:
-                        strncpy(url, token, 256);
+                        // strncpy(url, token, 256);
+                        url = mg_mk_str_n(token, 256);
                     case 2:
                         strncpy(port, token, 6);
                     }
@@ -288,13 +290,11 @@ static void uart_dispatcher(int uart_no, void *arg)
                 }
 
                 /* force null termination on all strings to prevent overflow */
-                request_type[1] = '\0';
-                url[255] = '\0';
                 port[5] = '\0';
 
                 if (param_counter == 3)
                 {
-                    mgos_uart_printf(UART_NO, "request type: %s, url: %s, port: %s\r\n", request_type, url, port);
+                    mgos_uart_printf(UART_NO, "request type: %c, url: %s, port: %s\r\n", request, url.p, port);
                 }
                 else
                 {
