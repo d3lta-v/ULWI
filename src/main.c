@@ -38,6 +38,7 @@
 #include "constants.h"
 #include "common.h"
 #include "wifi.h"
+#include "http.h"
 
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
@@ -259,42 +260,33 @@ static void uart_dispatcher(int uart_no, void *arg)
             // split up Get/Post, URL and port (3 parameters)
 
             const size_t parameter_len = line.len - 4;
+            const int max_param_len = 2;
             if (parameter_len < 266)
             {
                 char parameter_c_str[265] = {0}; /* 1 (Get/Post) + 255 (URL length) + 5 (port) + 3 null termination */
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
                 /* initialise individual parameter variables */
-                char request = '\0';
-                // char url[256];
-                struct mg_str url;
-                char port[6];
+                struct http_request request = { .method = '\0' };
 
                 char *token = strtok(parameter_c_str, delimiter);
                 int param_counter = 0;
-                while (token != NULL && param_counter < 3)
+                while (token != NULL && param_counter < max_param_len)
                 {
                     switch (param_counter)
                     {
                     case 0:
-                        request = token[0];
+                        request.method = token[0];
                     case 1:
-                        // strncpy(url, token, 256);
-                        url = mg_mk_str_n(token, 256);
-                    case 2:
-                        strncpy(port, token, 6);
+                        request.url = mg_mk_str_n(token, 256);
                     }
-                    // strncpy(result[param_counter], token, max_param_len);
                     token = strtok(NULL, delimiter);
                     param_counter++;
                 }
 
-                /* force null termination on all strings to prevent overflow */
-                port[5] = '\0';
-
-                if (param_counter == 3)
+                if (param_counter == max_param_len)
                 {
-                    mgos_uart_printf(UART_NO, "request type: %c, url: %s, port: %s\r\n", request, url.p, port);
+                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request.method, request.url.p);
                 }
                 else
                 {
