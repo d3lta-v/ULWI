@@ -266,8 +266,10 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[265] = {0}; /* 1 (Get/Post) + 255 (URL length) + 5 (port) + 3 null termination */
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
-                /* initialise individual parameter variables */
-                struct http_request request = { .method = '\0' };
+                /* TODO: fetch correct handle based on availablility, or return nothing
+                         if we ran out of handles to issue */
+                const int handle = 0;
+                struct http_request *request = &http_array[handle];
 
                 char *token = strtok(parameter_c_str, delimiter);
                 int param_counter = 0;
@@ -276,9 +278,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                     switch (param_counter)
                     {
                     case 0:
-                        request.method = token[0];
+                        request->method = token[0];
                     case 1:
-                        request.url = mg_mk_str_n(token, 256);
+                        request->url = mg_mk_str_n(token, 256);
                     }
                     token = strtok(NULL, delimiter);
                     param_counter++;
@@ -286,7 +288,7 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                 if (param_counter == max_param_len)
                 {
-                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request.method, request.url.p);
+                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url.p);
                 }
                 else
                 {

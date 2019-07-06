@@ -12,6 +12,8 @@ struct http_request
     struct mg_str headers;  /* HTTP headers of the request */
 };
 
-// static struct http_message http_array[3];
+struct http_request http_array[3];
+
+void http_cb(struct mg_connection *c, int ev, void *ev_data, void *ud);
 
 #endif
