@@ -115,20 +115,64 @@ HTTP method types:
 
 ## HTTP operations
 
-### Initiate HTTP Request
+### Initialise HTTP Request
 
-**Command**: `ihr <G/P>|<url>|<parameters>|<content>|<headers>`  
+**Command**: `ihr <G/P>|<url>`  
 **Type**: Action  
-**Purpose**: Initiates a HTTP request to a URL with all of the required parameters. If any of the fields are empty, simply skip over said field. A command may look like this without parameters, content or headers: `ihr G|https://fourier.industries|||`
+**Purpose**: Initialises a HTTP request to a URL with all of the required parameters, and creates a unique identifier. This command does not actually send the HTTP request.  
 **Parameters**:
 
 - `<G/P>`: GET or POST
-- `<url>`: The full URL, including protocol. Example: `https://fourier.industries/endpoint/`
-- `<parameters>`: Parameters to send to the server. Example: `var_1=value1&var_1=value2`
-- `<content>`: The content to send.
-- `<headers>`: HTTP headers to send.
+- `<url>`: The full URL, including protocol (e.g. HTTP or HTTPS). Example: `https://fourier.industries/endpoint/`
 
 **Returns**: A unique identifier or handle that identifies the HTTP request, or `U` if it failed to create the handle
+
+### Parameters of HTTP Request
+
+**Command**: `phr <http request handle>|<parameters>`  
+**Type**: Action  
+**Purpose**: Specifies the parameters field of a HTTP request before sending the request. This is done separately from `ihr`.  
+**Parameters**:
+
+- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
+- `<parameters>`: The parameters of the HTTP request. Example: `var_1=value1&var_1=value2`, which is typically behind the URL.
+
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
+
+### Content of HTTP Request
+
+**Command**: `chr <http request handle>|<content>`  
+**Type**: Action  
+**Purpose**: Specifies the contents field of a HTTP request before sending the request. This is done separately from `ihr`.
+**Parameters**:
+
+- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
+- `<content>`: The content of the HTTP request.
+
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
+
+### Headers of HTTP Request
+
+**Command**: `hhr <http request handle>|<headers>`  
+**Type**: Action  
+**Purpose**: Specifies the contents field of a HTTP request before sending the request. This is done separately from `ihr`.
+**Parameters**:
+
+- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
+- `<headers>`: The headers of the HTTP request. Example: `Header1: value1\nHeader2: value2`. This method ONLY accepts UNIX style line endings to separate headers (e.g. LF) and not Windows style line endings actually used by web servers (e.g. CRLF) to prevent the entry from messing with
+
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
+
+### Transmit HTTP Request
+
+**Command**: `thr <http request handle>`  
+**Type**: Action  
+**Purpose**: Transmits a HTTP request to the server specified.  
+**Parameters**:
+
+- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
+
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
 
 ### Status of HTTP Request
 
