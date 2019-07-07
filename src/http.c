@@ -53,3 +53,18 @@ void http_cb(struct mg_connection *c, int ev, void *ev_data, void *ud) {
         break;
     }
 }
+
+void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data)) {
+  if (ev == MG_EV_HTTP_REPLY) {
+    struct http_message *hm = (struct http_message *)ev_data;
+    nc->flags |= MG_F_CLOSE_IMMEDIATELY;
+    mgos_uart_printf(UART_NO, "%s", hm->message.p);
+    // fwrite(hm->message.p, 1, (int)hm->message.len, stdout);
+    // putchar('\n');
+    // exit_flag = 1;
+  } else if (ev == MG_EV_CLOSE) {
+    // exit_flag = 1;
+    LOG(LL_INFO, ("Connection closed"));
+  };
+  (void)user_data;
+}

@@ -315,8 +315,8 @@ static void uart_dispatcher(int uart_no, void *arg)
             const size_t parameter_len = line.len - 4;
             if (parameter_len > 0 && parameter_len < 2)
             {
-                /* TODO: fetch correct handle based on availablility, or return nothing
-                         if we ran out of handles to issue */
+                /* TODO: fetch correct handle based on availablility, or return
+                         nothing if we ran out of handles to issue */
                 char parameter_c_str[2] = {0};
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
@@ -325,11 +325,12 @@ static void uart_dispatcher(int uart_no, void *arg)
                 {
                     struct http_request *request = &http_array[handle];
 
-                    /* Check if handle refers to a null */
+                    /* Check if handle refers to a null by checking the method char for the null char */
                     if (request->method)
                     {
                         // not null
                         mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
+                        mg_connect_http(mgos_get_mgr(), &ev_handler, NULL, request->url, NULL, NULL);
                     }
                     else
                     {

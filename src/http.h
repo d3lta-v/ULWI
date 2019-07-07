@@ -13,5 +13,6 @@ struct http_request
 };
 
 void http_cb(struct mg_connection *c, int ev, void *ev_data, void *ud);
+void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
 
 #endif
