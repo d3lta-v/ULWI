@@ -12,6 +12,11 @@ struct http_request
     char headers[256];  /* HTTP headers of the request */
 };
 
+struct state {
+    int status;                     /* Request status (may be HTTP status as well) */
+    int64_t written;                /* Number of bytes written */
+};
+
 void http_cb(struct mg_connection *c, int ev, void *ev_data, void *ud);
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
 

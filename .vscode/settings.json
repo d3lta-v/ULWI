@@ -2,7 +2,9 @@
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "files.associations": {
         "*.c": "c",
-        "*.h": "c"
+        "*.h": "c",
+        "locale": "c",
+        "string": "c"
     },
     "mos.port": ""
 }

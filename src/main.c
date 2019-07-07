@@ -52,6 +52,12 @@ static struct http_request http_array[HTTP_HANDLES_MAX] =
     {'\0', "", "", "", ""},
     {'\0', "", "", "", ""}
 };
+static struct state state_array[HTTP_HANDLES_MAX] = 
+{
+    {0, 0},
+    {0, 0},
+    {0, 0}
+};
 
 
 /******************************************************************************
@@ -324,17 +330,15 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (handle < HTTP_HANDLES_MAX)
                 {
                     struct http_request *request = &http_array[handle];
+                    struct state *state = &state_array[handle];
 
                     /* Check if handle refers to a null by checking the method char for the null char */
                     if (request->method)
                     {
-                        // not null
-                        mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
-                        mg_connect_http(mgos_get_mgr(), &ev_handler, NULL, request->url, NULL, NULL);
+                        mg_connect_http(mgos_get_mgr(), &ev_handler, state, request->url, NULL, NULL);
                     }
                     else
                     {
-                        // null
                         mgos_uart_printf(UART_NO, "U\r\n");
                     }
                 }
