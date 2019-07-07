@@ -44,6 +44,16 @@
 #define DEVELOPMENT
 
 #ifdef DEVELOPMENT
+
+#define HTTP_HANDLES_MAX 3
+static struct http_request http_array[HTTP_HANDLES_MAX] = 
+{
+    {'\0', "", "", "", ""},
+    {'\0', "", "", "", ""},
+    {'\0', "", "", "", ""}
+};
+
+
 /******************************************************************************
  *                                                                            *
  * FUNCTION NAME: timer_cb                                                    *
@@ -165,10 +175,10 @@ static void uart_dispatcher(int uart_no, void *arg)
             strncpy(parameter_c_str, line.p+4, parameter_len);
 
             const int max_params = 5;
-            const int max_param_len = 65;
-            char result[max_params][max_param_len];
+            const int max_param_count = 65;
+            char result[max_params][max_param_count];
 
-            const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
+            const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_count, result);
             
             if (param_len == 2)
             {
@@ -257,13 +267,12 @@ static void uart_dispatcher(int uart_no, void *arg)
         }
         else if (mg_str_starts_with(line, COMMAND_IHR) && line.len > 4)
         {
-            // split up Get/Post, URL and port (3 parameters)
-
+            /* Initialise HTTP Request */
             const size_t parameter_len = line.len - 4;
-            const int max_param_len = 2;
-            if (parameter_len < 266)
+            const int max_param_count = 2;
+            if (parameter_len < 258)
             {
-                char parameter_c_str[265] = {0}; /* 1 (Get/Post) + 255 (URL length) + 5 (port) + 3 null termination */
+                char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
                 /* TODO: fetch correct handle based on availablility, or return nothing
@@ -273,27 +282,66 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                 char *token = strtok(parameter_c_str, delimiter);
                 int param_counter = 0;
-                while (token != NULL && param_counter < max_param_len)
+                while (token != NULL && param_counter < max_param_count)
                 {
                     switch (param_counter)
                     {
                     case 0:
                         request->method = token[0];
                     case 1:
-                        request->url = mg_mk_str_n(token, 256);
+                        strncpy(request->url, token, 255);
                     }
                     token = strtok(NULL, delimiter);
                     param_counter++;
                 }
 
-                if (param_counter == max_param_len)
+                if (param_counter == max_param_count)
                 {
-                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url.p);
+                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
                 }
                 else
                 {
                     mgos_uart_printf(UART_NO, "short\r\n");
                 }
+            }
+            else
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_THR) && line.len > 4)
+        {
+            /* Transmit HTTP request */
+            const size_t parameter_len = line.len - 4;
+            if (parameter_len > 0 && parameter_len < 2)
+            {
+                /* TODO: fetch correct handle based on availablility, or return nothing
+                         if we ran out of handles to issue */
+                char parameter_c_str[2] = {0};
+                strncpy(parameter_c_str, line.p+4, parameter_len);
+
+                const size_t handle = atoi(parameter_c_str);
+                if (handle < HTTP_HANDLES_MAX)
+                {
+                    struct http_request *request = &http_array[handle];
+
+                    /* Check if handle refers to a null */
+                    if (request->method)
+                    {
+                        // not null
+                        mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
+                    }
+                    else
+                    {
+                        // null
+                        mgos_uart_printf(UART_NO, "U\r\n");
+                    }
+                }
+                else
+                {
+                    /* Handle count is way too high and will result in undefined behaviour */
+                    mgos_uart_printf(UART_NO, "U\r\n");
+                }   
             }
             else
             {
