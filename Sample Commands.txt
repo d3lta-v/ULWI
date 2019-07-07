@@ -1,0 +1,12 @@
+This text document contains the hexadecimal versions of commonly used commands, for debugging purposes.
+
+Keep in mind that the delimiters in the actual hexadecimals are actually 0x1F ASCII unit separators, not vertical lines.
+
+Connect to Access Point (cap ssid|pwd)
+63 61 70 20 73 73 69 64 1F 70 77 64 0D 0A
+
+Initiate HTTP GET request (ihr G|http://captive.apple.com)
+69 68 72 20 47 1F 68 74 74 70 3A 2F 2F 63 61 70 74 69 76 65 2E 61 70 70 6C 65 2E 63 6F 6D 0D 0A
+
+Transmit HTTP request (thr 0)
+74 68 72 20 30 0D 0A
