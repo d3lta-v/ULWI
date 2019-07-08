@@ -296,7 +296,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     case 0:
                         request->method = token[0];
                     case 1:
-                        strncpy(request->url, token, 255);
+                        strcpy(request->url, token);
                     }
                     token = strtok(NULL, delimiter);
                     param_counter++;
@@ -326,8 +326,6 @@ static void uart_dispatcher(int uart_no, void *arg)
             const size_t parameter_len = line.len - 4;
             if (parameter_len > 0 && parameter_len < 2)
             {
-                /* TODO: fetch correct handle based on availablility, or return
-                         nothing if we ran out of handles to issue */
                 char parameter_c_str[2] = {0};
                 strncpy(parameter_c_str, line.p+4, parameter_len);
 
@@ -352,6 +350,32 @@ static void uart_dispatcher(int uart_no, void *arg)
                     /* Handle count is way too high and will result in undefined behaviour */
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }   
+            }
+            else
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_SHR) && line.len > 4)
+        {
+            /* Status of HTTP request */
+            const size_t parameter_len = line.len - 4;
+            if (parameter_len > 0 && parameter_len < 2)
+            {
+                char parameter_c_str[2] = {0};
+                strncpy(parameter_c_str, line.p+4, parameter_len);
+
+                const size_t handle = atoi(parameter_c_str);
+                if (handle < HTTP_HANDLES_MAX)
+                {
+                    struct state *state = &state_array[handle];
+                    mgos_uart_printf(UART_NO, "%c\r\n", (char)state->progress);
+                }
+                else
+                {
+                    /* Handle count is way too high and definitely does not exist */
+                    mgos_uart_printf(UART_NO, "N\r\n");
+                }  
             }
             else
             {

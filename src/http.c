@@ -39,7 +39,7 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
         else
         {
             state->progress = FAILED;
-            LOG(LL_ERROR, ("Connection closed with error code: %d\r\n", state->status));
+            LOG(LL_ERROR, ("Connection closed with error code: %d", state->status));
         }
         /* NOTE: Manual memory management must be done to the state variable to prevent memory leaks */
         break;

@@ -17,10 +17,10 @@ struct http_request
 
 enum request_progress
 {
-    NONEXISTENT,    /* This request does not exist at all */
-    IN_PROGRESS,    /* This request is being processed */
-    SUCCESS,        /* Successful request */
-    FAILED          /* Failed request */
+    NONEXISTENT = 'N',    /* This request does not exist at all */
+    IN_PROGRESS = 'P',    /* This request is being processed */
+    SUCCESS = 'S',        /* Successful request */
+    FAILED = 'U'          /* Failed (unsuccessful) request */
 };
 
 struct state
