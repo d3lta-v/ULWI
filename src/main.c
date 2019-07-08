@@ -54,9 +54,9 @@ static struct http_request http_array[HTTP_HANDLES_MAX] =
 };
 static struct state state_array[HTTP_HANDLES_MAX] = 
 {
-    {0, 0},
-    {0, 0},
-    {0, 0}
+    {NONEXISTENT, 0, 0, ""},
+    {NONEXISTENT, 0, 0, ""},
+    {NONEXISTENT, 0, 0, ""}
 };
 
 
@@ -285,6 +285,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                          if we ran out of handles to issue */
                 const int handle = 0;
                 struct http_request *request = &http_array[handle];
+                struct state *state = &state_array[handle];
 
                 char *token = strtok(parameter_c_str, delimiter);
                 int param_counter = 0;
@@ -303,10 +304,14 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                 if (param_counter == max_param_count)
                 {
+                    /* Empty state  */
+                    empty_state(state);
                     mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
                 }
                 else
                 {
+                    /* Reset request if there are not enough parameters given */
+                    empty_request(request);
                     mgos_uart_printf(UART_NO, "short\r\n");
                 }
             }
