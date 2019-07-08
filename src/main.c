@@ -200,8 +200,8 @@ static void uart_dispatcher(int uart_no, void *arg)
             {
                 const struct mgos_config_wifi_sta wifi_config = 
                 { 
-                    .enable = true, 
-                    .ssid = result[0], 
+                    .enable = true,
+                    .ssid = result[0],
                     .pass = result[1],
                     .ip = result[2],
                     .gw = result[3],
@@ -304,9 +304,10 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                 if (param_counter == max_param_count)
                 {
-                    /* Empty state  */
+                    /* Empty state */
                     empty_state(state);
-                    mgos_uart_printf(UART_NO, "request type: %c\nurl: %s\r\n", request->method, request->url);
+                    mgos_uart_printf(UART_NO, "%i\r\n", handle);
+                    LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
                 }
                 else
                 {
