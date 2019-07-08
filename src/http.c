@@ -46,7 +46,7 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
     }
 }
 
-void empty_state(struct state *s)
+void ulwi_empty_state(struct state *s)
 {
     s->progress = NONEXISTENT; /* Reset progress as this is a new request */
     s->status = 0;
@@ -54,7 +54,7 @@ void empty_state(struct state *s)
     s->content[0] = '\0';
 }
 
-void empty_request(struct http_request *r)
+void ulwi_empty_request(struct http_request *r)
 {
     r->method = '\0';
     r->url[0] = '\0';

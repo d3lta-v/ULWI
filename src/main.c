@@ -305,14 +305,16 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (param_counter == max_param_count)
                 {
                     /* Empty state */
-                    empty_state(state);
+                    ulwi_empty_state(state);
                     mgos_uart_printf(UART_NO, "%i\r\n", handle);
                     LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
                 }
                 else
                 {
-                    /* Reset request if there are not enough parameters given */
-                    empty_request(request);
+                    /* Reset request if there are not enough parameters given,
+                       reason being that the request is filled before checking
+                       for max parameter count */
+                    ulwi_empty_request(request);
                     mgos_uart_printf(UART_NO, "short\r\n");
                 }
             }
