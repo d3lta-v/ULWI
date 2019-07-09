@@ -43,8 +43,6 @@
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
 
-#ifdef DEVELOPMENT
-
 #define HTTP_HANDLES_MAX 3
 static struct http_request http_array[HTTP_HANDLES_MAX] = 
 {
@@ -59,7 +57,7 @@ static struct state state_array[HTTP_HANDLES_MAX] =
     {NONEXISTENT, 0, 0, ""}
 };
 
-
+#ifdef DEVELOPMENT
 /******************************************************************************
  *                                                                            *
  * FUNCTION NAME: timer_cb                                                    *
@@ -195,6 +193,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     .pass = result[1]
                 };
                 mgos_wifi_setup_sta(&wifi_config);
+                mgos_uart_printf(UART_NO, "\r\n");
             }
             else if (param_len == 5)
             {
@@ -208,6 +207,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     .netmask = result[4]
                 };
                 mgos_wifi_setup_sta(&wifi_config);
+                mgos_uart_printf(UART_NO, "\r\n");
             }
             else
             {
