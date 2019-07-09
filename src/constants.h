@@ -38,6 +38,7 @@ static const struct mg_str COMMAND_DAP = MG_MK_STR("dap");
 static const struct mg_str COMMAND_GIP = MG_MK_STR("gip");
 
 static const struct mg_str COMMAND_IHR = MG_MK_STR("ihr");
+static const struct mg_str COMMAND_PHR = MG_MK_STR("phr");
 static const struct mg_str COMMAND_THR = MG_MK_STR("thr");
 static const struct mg_str COMMAND_SHR = MG_MK_STR("shr");
 

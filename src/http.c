@@ -22,7 +22,7 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
             state->written += hm->body.len;
             strncat(state->content, hm->body.p, hm->body.len);
         }
-        nc->flags |= MG_F_DELETE_CHUNK; /* immediately delete chunk after it's read to conserve memory */
+        nc->flags |= MG_F_DELETE_CHUNK; /* delete chunk right after it's read to conserve heap memory */
         break;
     }
     case MG_EV_HTTP_REPLY:
@@ -41,7 +41,9 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
             state->progress = FAILED;
             LOG(LL_ERROR, ("Connection closed with error code: %d", state->status));
         }
-        /* NOTE: Manual memory management must be done to the state variable to prevent memory leaks */
+        /* NOTE: Manual memory management must be done to the state variable
+           to prevent memory leaks. Alternatively, manual memory management
+           is also possible */
         break;
     }
 }
