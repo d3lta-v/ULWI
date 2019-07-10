@@ -15,6 +15,13 @@ struct http_request
     char headers[HTTP_TX_CONTENT_MAX];  /* HTTP headers of the request */
 };
 
+enum http_data
+{
+    PARAMETER,
+    CONTENT,
+    HEADER
+};
+
 enum request_progress
 {
     NONEXISTENT = 'N',    /* This request does not exist at all */
@@ -33,7 +40,7 @@ struct state
 
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
 
-void insert_field_http_request(struct mg_str *line, struct http_request *http_array);
+void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array);
 void ulwi_empty_state(struct state *s);
 void ulwi_empty_request(struct http_request *r);
 

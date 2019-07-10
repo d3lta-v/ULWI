@@ -327,7 +327,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_PHR) && line.len > 4)
         {
             /* Parameter of HTTP request */
-            insert_field_http_request(&line, http_array);
+            insert_field_http_request(PARAMETER, &line, http_array);
         }
         else if (mg_str_starts_with(line, COMMAND_THR) && line.len > 4)
         {

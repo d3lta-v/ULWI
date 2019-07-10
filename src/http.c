@@ -65,7 +65,7 @@ void ulwi_empty_request(struct http_request *r)
     r->headers[0] = '\0';
 }
 
-void insert_field_http_request(struct mg_str *line, struct http_request *http_array)
+void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array)
 {
     const size_t parameter_len = line->len - 4;
     if (parameter_len > 0 && parameter_len < 2 + HTTP_TX_CONTENT_MAX)
@@ -105,8 +105,18 @@ void insert_field_http_request(struct mg_str *line, struct http_request *http_ar
                 if (handle != -1)
                 {
                     LOG(LL_INFO, ("params: %s", token));
-                    /* TODO: insert other parameters other than parameters */
-                    strcpy(http_array[handle].params, token);
+                    switch (type)
+                    {
+                    case PARAMETER:
+                        strcpy(http_array[handle].params, token);
+                        break;
+                    case CONTENT:
+                        strcpy(http_array[handle].content, token);
+                        break;
+                    case HEADER:
+                        strcpy(http_array[handle].headers, token);
+                        break;
+                    }
                     mgos_uart_printf(UART_NO, "S\r\n");
                 }
                 break;
