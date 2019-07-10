@@ -104,16 +104,19 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                 /* Copy the parameters over */
                 if (handle != -1)
                 {
-                    LOG(LL_INFO, ("params: %s", token));
                     switch (type)
                     {
                     case PARAMETER:
+                        LOG(LL_INFO, ("params: %s", token));
                         strcpy(http_array[handle].params, token);
                         break;
                     case CONTENT:
+                        LOG(LL_INFO, ("content: %s", token));
                         strcpy(http_array[handle].content, token);
                         break;
                     case HEADER:
+                        /* TODO: replace headers \n with \r\n */
+                        LOG(LL_INFO, ("headers: %s", token));
                         strcpy(http_array[handle].headers, token);
                         break;
                     }

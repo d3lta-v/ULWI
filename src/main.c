@@ -329,6 +329,16 @@ static void uart_dispatcher(int uart_no, void *arg)
             /* Parameter of HTTP request */
             insert_field_http_request(PARAMETER, &line, http_array);
         }
+        else if (mg_str_starts_with(line, COMMAND_CHR) && line.len > 4)
+        {
+            /* Content of HTTP request */
+            insert_field_http_request(CONTENT, &line, http_array);
+        }
+        else if (mg_str_starts_with(line, COMMAND_HHR) && line.len > 4)
+        {
+            /* Header of HTTP request */
+            insert_field_http_request(HEADER, &line, http_array);
+        }
         else if (mg_str_starts_with(line, COMMAND_THR) && line.len > 4)
         {
             /* Transmit HTTP request */
@@ -347,7 +357,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     /* Check if handle refers to a null by checking the method char for the null char */
                     if (request->method)
                     {
-                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s", request->method, request->url, request->params));
+                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url, request->params, request->content, request->headers));
                         mg_connect_http(mgos_get_mgr(), &ev_handler, state, request->url, NULL, NULL);
                     }
                     else
