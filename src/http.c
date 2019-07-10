@@ -64,3 +64,64 @@ void ulwi_empty_request(struct http_request *r)
     r->content[0] = '\0';
     r->headers[0] = '\0';
 }
+
+void insert_field_http_request(struct mg_str *line, struct http_request *http_array)
+{
+    const size_t parameter_len = line->len - 4;
+    if (parameter_len > 0 && parameter_len < 2 + HTTP_TX_CONTENT_MAX)
+    {
+        char parameter_c_str[2+HTTP_TX_CONTENT_MAX] = "";
+        strncpy(parameter_c_str, line->p+4, parameter_len);
+
+        char raw_handle[2] = "";
+        int handle = 0;
+        // struct state *state = &state_array[handle];
+
+        char *token = strtok(parameter_c_str, delimiter);
+        int param_counter = 0;
+        const int max_param_count = 2;
+        while (token != NULL && param_counter < max_param_count)
+        {
+            switch (param_counter)
+            {
+            case 0:
+                strncpy(raw_handle, token, 1);
+                raw_handle[1] = '\0'; /* Forcibly null terminate it */
+                handle = atoi(raw_handle);
+                if (handle >= HTTP_HANDLES_MAX || handle < 0)
+                {
+                    /* Perform basic validation of handle */
+                    handle = -1; /* invalidate the handle */
+                }
+                else if (http_array[handle].method == '\0')
+                {
+                    /* Perform deep validation of handle if it passed basic */
+                    /* If method is null ('\0'), it means that this handle does not exist */
+                    handle = -1; /* invalidate the handle */
+                }
+                break;
+            case 1:
+                /* Copy the parameters over */
+                if (handle != -1)
+                {
+                    LOG(LL_INFO, ("params: %s", token));
+                    /* TODO: insert other parameters other than parameters */
+                    strcpy(http_array[handle].params, token);
+                    mgos_uart_printf(UART_NO, "S\r\n");
+                }
+                break;
+            }
+            token = strtok(NULL, delimiter);
+            param_counter++;
+        }
+
+        if (handle == -1)
+        {
+            mgos_uart_printf(UART_NO, "U\r\n");
+        }
+    }
+    else
+    {
+        mgos_uart_printf(UART_NO, "long\r\n");
+    }
+}

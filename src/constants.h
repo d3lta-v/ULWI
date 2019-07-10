@@ -23,6 +23,8 @@
 
 #define UART_NO 0
 
+#define HTTP_HANDLES_MAX 3
+
 static const char delimiter[] = "\x1f";
 
 static const struct mg_str COMMAND_NOP = MG_MK_STR("nop");
