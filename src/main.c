@@ -70,12 +70,10 @@ static struct state state_array[HTTP_HANDLES_MAX] =
  *                                                                            *
  *****************************************************************************/
 static void timer_cb(void *arg) {
-    static bool s_tick_tock = false;
     LOG(LL_INFO,
         ("uptime: %.2lf, RAM: %lu, %lu free",
         mgos_uptime(), (unsigned long) mgos_get_heap_size(),
         (unsigned long) mgos_get_free_heap_size()));
-    s_tick_tock = !s_tick_tock;
     (void) arg;
 }
 #endif /* DEVELOPMENT */
@@ -114,41 +112,35 @@ static void uart_dispatcher(int uart_no, void *arg)
 
     /* Phase 3: Read input into buffer and appropriately terminate the line */
     mgos_uart_read_mbuf(uart_no, &buffer, available_size);
-    /* Retrieve pointer of the last character, in this case it's the newline */
-    char *line_ending = (char *)mg_strchr(mg_mk_str_n(buffer.buf, buffer.len), '\n');
+    /* Retrieve pointer of the last character, in this case it's the CR character */
+    char *line_ending = (char *)mg_strchr(mg_mk_str_n(buffer.buf, buffer.len), '\r');
     if (line_ending == NULL)
     {
         /* Unable to find newline or line termination, ignoring input */
         return;
     }
-    *line_ending = '\0'; /* Null terminate the string, replacing newline with NULL*/
-    size_t line_length = line_ending - buffer.buf;
-    /* Creates an mg_str (basically a string) from buffer.buf (which is a C array) */
-    struct mg_str line = mg_mk_str_n(buffer.buf, line_length);
-    /* Check for CR as well. Remember that valid commands are terminated with
-     * \r\n, not \n, so that content can be terminated with \n */
-    if (line_ending > buffer.buf && *(line_ending - 1) == '\r')
+    if (*(line_ending + 1) != '\n')
     {
-        /* CR found, command is valid, remove the \r */
-        *(line_ending - 1) = '\0';
-        line.len--;
-    }
-    else
-    {
-        /* CR not found, command might be incomplete, but might be newline in content */
-#ifdef DEVELOPMENT
-        LOG(LL_WARN, ("Command might be incomplete!"));
-#endif
+        /* Check if the next character in sequence is NL which is a full
+           modern Windows style CRLF (\r\n) */
+        /* CAVEAT: This will cause any input containing \r only to be ignored */
         return;
     }
+    *(line_ending + 1) = '\0'; /* Null terminate the string, replacing NL (NOT CR!) with NULL */
+    size_t line_length = line_ending + 1 - buffer.buf;
+    /* Creates an mg_str (basically a string) from buffer.buf (which is a C array) */
+    struct mg_str line = mg_mk_str_n(buffer.buf, line_length);
+    /* Manually strip CR from line after NL is processed as the termination character */
+    /* This is to fully flush the serial buffer */
+    *line_ending = '\0';
+    line.len--;
 
     /* Now we can process the line itself, because we've null terminated the
      * line correctly (it's a C string now) and removed newline characters */
 
-    /* The sample line comparisons here are just for illustration purposes */
-
     /* Phase I: basic command sanitisation */
-    if (line_length < (3 + 1)) /* Keep into account the null character for termination */
+    // LOG(LL_INFO, ("input length: %d, input: %s", line.len, line.p));
+    if (line.len < 3)
     {
         mgos_uart_printf(UART_NO, "short\r\n");
     }
