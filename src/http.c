@@ -1,4 +1,5 @@
 #include "http.h"
+#include "common.h"
 #include "mgos_rpc.h"
 #include "constants.h"
 
@@ -114,11 +115,13 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                         LOG(LL_INFO, ("content: %s", token));
                         strcpy(http_array[handle].content, token);
                         break;
-                    case HEADER:
-                        /* TODO: replace headers \n with \r\n */
-                        LOG(LL_INFO, ("headers: %s", token));
-                        strcpy(http_array[handle].headers, token);
+                    case HEADER: {
+                        char *buffer = repl_str(token, "\n", "\r\n");
+                        LOG(LL_INFO, ("headers: %s", buffer));
+                        strcpy(http_array[handle].headers, buffer);
+                        free(buffer);
                         break;
+                    }
                     }
                     mgos_uart_printf(UART_NO, "S\r\n");
                 }
