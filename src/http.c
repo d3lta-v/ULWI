@@ -78,7 +78,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
         int handle = 0;
         // struct state *state = &state_array[handle];
 
-        char *token = strtok(parameter_c_str, delimiter);
+        char *token = strtok(parameter_c_str, ULWI_DELIMITER);
         int param_counter = 0;
         const int max_param_count = 2;
         while (token != NULL && param_counter < max_param_count)
@@ -129,7 +129,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                 }
                 break;
             }
-            token = strtok(NULL, delimiter);
+            token = strtok(NULL, ULWI_DELIMITER);
             param_counter++;
         }
 

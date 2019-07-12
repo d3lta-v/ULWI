@@ -26,14 +26,14 @@
  *****************************************************************************/
 int split_parameter_string(char *target_str, const int max_params, const int max_param_len, char result[max_params][max_param_len])
 {
-    char *token = strtok(target_str, delimiter);
+    char *token = strtok(target_str, ULWI_DELIMITER);
 
     int max_param_counter = 0;
 
     while (token != NULL && max_param_counter < max_params)
     {
         strncpy(result[max_param_counter], token, max_param_len);
-        token = strtok(NULL, delimiter);
+        token = strtok(NULL, ULWI_DELIMITER);
         max_param_counter++;
     }
 

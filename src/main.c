@@ -278,7 +278,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 struct http_request *request = &http_array[handle];
                 struct state *state = &state_array[handle];
 
-                char *token = strtok(parameter_c_str, delimiter);
+                char *token = strtok(parameter_c_str, ULWI_DELIMITER);
                 int param_counter = 0;
                 while (token != NULL && param_counter < max_param_count)
                 {
@@ -291,7 +291,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         strcpy(request->url, token);
                         break;
                     }
-                    token = strtok(NULL, delimiter);
+                    token = strtok(NULL, ULWI_DELIMITER);
                     param_counter++;
                 }
 
@@ -403,6 +403,16 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[16] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len);
 
+                // const int handle = 0;
+                // struct http_request *request = &http_array[handle];
+                // struct state *state = &state_array[handle];
+
+                // char *token = strtok(parameter_c_str, ULWI_DELIMITER);
+                // int param_counter = 0;
+                // while (token != NULL && param_counter < max_param_count)
+                // {
+
+                // }
                 // const size_t handle = atoi(parameter_c_str);
                 // if (handle < HTTP_HANDLES_MAX)
                 // {
