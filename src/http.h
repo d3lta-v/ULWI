@@ -6,20 +6,12 @@
 #define HTTP_TX_CONTENT_MAX 256
 #define HTTP_RX_CONTENT_MAX 512
 
-struct http_request
-{
-    char method;                        /* HTTP method of the request, G for GET, P for POST and so on */
-    char url[HTTP_TX_CONTENT_MAX];      /* Full URL of the request */
-    char params[HTTP_TX_CONTENT_MAX];   /* Parameters of the request, usually part of the URL */
-    char content[HTTP_TX_CONTENT_MAX];  /* Content of the request */
-    char headers[HTTP_TX_CONTENT_MAX];  /* HTTP headers of the request */
-};
-
 enum http_data
 {
-    PARAMETER,
-    CONTENT,
-    HEADER
+    PARAMETER,  /* Specifies parameters for a HTTP request. Only applicable for the PHR command */
+    CONTENT,    /* Specifies or retrieves content for HTTP data */
+    HEADER,     /* Specifies or retrieves headers for HTTP data */
+    STATE       /* Retrieves the current state of the HTTP data. Only applicable for the GHR command */
 };
 
 enum request_progress
@@ -30,9 +22,18 @@ enum request_progress
     FAILED = 'U'          /* Failed (unsuccessful) request */
 };
 
+struct http_request
+{
+    char method;                        /* HTTP method of the request, G for GET, P for POST and so on */
+    char url[HTTP_TX_CONTENT_MAX];      /* Full URL of the request */
+    char params[HTTP_TX_CONTENT_MAX];   /* Parameters of the request, usually part of the URL */
+    char content[HTTP_TX_CONTENT_MAX];  /* Content of the request */
+    char headers[HTTP_TX_CONTENT_MAX];  /* HTTP headers of the request */
+};
+
 struct state
 {
-    enum request_progress progress;              /* Current progress of the request */
+    enum request_progress progress;     /* Current progress of the request */
     int status;                         /* Request status (may be HTTP status as well) */
     int64_t written;                    /* Number of bytes written */
     char content[HTTP_RX_CONTENT_MAX];  /* Content of the HTTP response */

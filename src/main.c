@@ -394,6 +394,32 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "long\r\n");
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_GHR) && line.len > 4)
+        {
+            /* Get HTTP request */
+            const size_t parameter_len = line.len - 4;
+            if (parameter_len > 0 && parameter_len < 16)
+            {
+                char parameter_c_str[16] = {0};
+                strlcpy(parameter_c_str, line.p+4, parameter_len);
+
+                // const size_t handle = atoi(parameter_c_str);
+                // if (handle < HTTP_HANDLES_MAX)
+                // {
+                //     struct state *state = &state_array[handle];
+                //     mgos_uart_printf(UART_NO, "%c\r\n", (char)state->progress);
+                // }
+                // else
+                // {
+                //     /* Handle count is way too high and definitely does not exist */
+                //     mgos_uart_printf(UART_NO, "N\r\n");
+                // }  
+            }
+            else
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");

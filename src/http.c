@@ -72,7 +72,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
     if (parameter_len > 0 && parameter_len < 2 + HTTP_TX_CONTENT_MAX)
     {
         char parameter_c_str[2+HTTP_TX_CONTENT_MAX] = "";
-        strncpy(parameter_c_str, line->p+4, parameter_len);
+        strlcpy(parameter_c_str, line->p+4, parameter_len);
 
         char raw_handle[2] = "";
         int handle = 0;
@@ -122,6 +122,8 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                         free(buffer);
                         break;
                     }
+                    case STATE:
+                        break;
                     }
                     mgos_uart_printf(UART_NO, "S\r\n");
                 }
