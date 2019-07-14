@@ -167,7 +167,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             const size_t parameter_len = line.len - 4;
             char parameter_c_str[177] = {0}; /* 128 + 16*3 + null termination char */
-            strncpy(parameter_c_str, line.p+4, parameter_len);
+            strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
             const int max_params = 5;
             const int max_param_count = 65;
@@ -270,7 +270,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             if (parameter_len < 258)
             {
                 char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
-                strncpy(parameter_c_str, line.p+4, parameter_len);
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
                 /* TODO: fetch correct handle based on availablility, or return nothing
                          if we ran out of handles to issue */
@@ -338,7 +338,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             if (parameter_len > 0 && parameter_len < 2)
             {
                 char parameter_c_str[2] = {0};
-                strncpy(parameter_c_str, line.p+4, parameter_len);
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
                 const size_t handle = atoi(parameter_c_str);
                 if (handle < HTTP_HANDLES_MAX)
@@ -375,7 +375,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             if (parameter_len > 0 && parameter_len < 2)
             {
                 char parameter_c_str[2] = {0};
-                strncpy(parameter_c_str, line.p+4, parameter_len);
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
                 const size_t handle = atoi(parameter_c_str);
                 if (handle < HTTP_HANDLES_MAX)
@@ -401,18 +401,103 @@ static void uart_dispatcher(int uart_no, void *arg)
             if (parameter_len > 0 && parameter_len < 16)
             {
                 char parameter_c_str[16] = {0};
-                strlcpy(parameter_c_str, line.p+4, parameter_len);
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1); /* +1 for null termination */
 
                 // const int handle = 0;
                 // struct http_request *request = &http_array[handle];
                 // struct state *state = &state_array[handle];
 
-                // char *token = strtok(parameter_c_str, ULWI_DELIMITER);
-                // int param_counter = 0;
-                // while (token != NULL && param_counter < max_param_count)
-                // {
+                int handle = -1;
+                enum http_data command_type;
+                enum boolean purge;
 
-                // }
+                char *token = strtok(parameter_c_str, ULWI_DELIMITER);
+                int param_counter = 0;
+                const int max_param_count = 3;
+                while (token != NULL && param_counter < max_param_count)
+                {
+                    switch (param_counter)
+                    {
+                    case 0:
+                        /* Handle */
+                        handle = atoi(token);
+                        LOG(LL_INFO, ("GHR handle parsed: %d", handle));
+                        break;
+                    case 1:
+                        /* S/H/C (enum http_data) */
+                        LOG(LL_INFO, ("GHR type parsed: %c", token[0]));
+                        switch (token[0])
+                        {
+                        case 'S':
+                            command_type = STATE;
+                            break;
+                        case 'H':
+                            command_type = HEADER;
+                            break;
+                        case 'C':
+                            command_type = CONTENT;
+                            break;
+                        default:
+                            break;
+                        }
+                        break;
+                    case 2:
+                        /* Boolean for whether to purge the request */
+                        LOG(LL_INFO, ("GHR bool parsed: %c", token[0]));
+                        switch (token[0])
+                        {
+                        case 'T':
+                            purge = ULWI_TRUE;
+                            break;
+                        case 'F':
+                            purge = ULWI_FALSE;
+                            break;
+                        default:
+                            break;
+                        }
+                        break;
+                    }
+                    token = strtok(NULL, ULWI_DELIMITER);
+                    param_counter++;
+                }
+                LOG(LL_INFO, ("GHR param count: %d", param_counter));
+                if (param_counter == max_param_count)
+                {
+                    /* Correct number of arguments */
+                    /* TODO: add argument checking logic here, such as validating the handle */
+
+                    struct state *http_response = &state_array[handle];
+
+                    switch (command_type)
+                    {
+                    case STATE:
+                        /* Get state */
+                        mgos_uart_printf(UART_NO, "%c\r\n", (char)http_response->progress);
+                        break;
+                    case HEADER:
+                        /* Get headers of the HTTP response */
+                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->header);
+                        break;
+                    case CONTENT:
+                        /* Get content of the HTTP response */
+                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->content);
+                        break;
+                    default:
+                        break;
+                    }
+
+                    /* See whether or not to purge the request */
+                    if (purge == ULWI_TRUE)
+                    {
+                        /* Purge said request */
+                        ulwi_empty_state(http_response);
+                        ulwi_empty_request(&http_array[handle]);
+                    }
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "short\r\n");
+                }
                 // const size_t handle = atoi(parameter_c_str);
                 // if (handle < HTTP_HANDLES_MAX)
                 // {
