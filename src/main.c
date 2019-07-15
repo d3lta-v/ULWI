@@ -476,7 +476,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         break;
                     case HEADER:
                         /* Get headers of the HTTP response */
-                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->header);
+                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->headers);
                         break;
                     case CONTENT:
                         /* Get content of the HTTP response */
