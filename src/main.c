@@ -43,12 +43,7 @@
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
 
-static struct http_request http_array[HTTP_HANDLES_MAX] = 
-{
-    {'\0', "", "", "", ""},
-    {'\0', "", "", "", ""},
-    {'\0', "", "", "", ""}
-};
+static struct http_request http_array[HTTP_HANDLES_MAX];
 static struct state state_array[HTTP_HANDLES_MAX] = 
 {
     {NONEXISTENT, 0, 0, ""},
@@ -129,7 +124,7 @@ static void uart_dispatcher(int uart_no, void *arg)
     *(line_ending + 1) = '\0'; /* Null terminate the string, replacing NL (NOT CR!) with NULL */
     size_t line_length = line_ending + 1 - buffer.buf;
     /* Creates an mg_str (basically a string) from buffer.buf (which is a C array) */
-    struct mg_str line = mg_mk_str_n(buffer.buf, line_length);
+    struct mg_str line = MG_MK_STR_N(buffer.buf, line_length);
     /* Manually strip CR from line after NL is processed as the termination character */
     /* This is to fully flush the serial buffer */
     *line_ending = '\0';
@@ -349,6 +344,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                     /* Check if handle refers to a null by checking the method char for the null char */
                     if (request->method)
                     {
+                        /* Clear the previous state */
+                        ulwi_empty_state(state);
                         LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url, request->params, request->content, request->headers));
                         mg_connect_http(mgos_get_mgr(), &ev_handler, state, request->url, NULL, NULL);
                     }
@@ -480,7 +477,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                         break;
                     case CONTENT:
                         /* Get content of the HTTP response */
-                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->content);
+                        /* TODO: Ensure proper null termination here */
+                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->content.p);
                         break;
                     default:
                         break;

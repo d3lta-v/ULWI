@@ -36,8 +36,9 @@ struct state
     enum request_progress progress;     /* Current progress of the request */
     int status;                         /* Request status (may be HTTP status as well) */
     int64_t written;                    /* Number of bytes written */
-    char headers[HTTP_RX_CONTENT_MAX];   /* Headers of the HTTP response */
-    char content[HTTP_RX_CONTENT_MAX];  /* Content of the HTTP response */
+    char headers[HTTP_RX_CONTENT_MAX];  /* Headers of the HTTP response */
+    struct mbuf content_buffer;
+    struct mg_str content;
 };
 
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
