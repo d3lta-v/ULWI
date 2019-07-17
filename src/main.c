@@ -44,12 +44,7 @@
 #define DEVELOPMENT
 
 static struct http_request http_array[HTTP_HANDLES_MAX];
-static struct state state_array[HTTP_HANDLES_MAX] = 
-{
-    {NONEXISTENT, 0, 0, ""},
-    {NONEXISTENT, 0, 0, ""},
-    {NONEXISTENT, 0, 0, ""}
-};
+static struct state state_array[HTTP_HANDLES_MAX];
 
 #ifdef DEVELOPMENT
 /******************************************************************************

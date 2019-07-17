@@ -3,6 +3,33 @@
 #include "mgos_rpc.h"
 #include "constants.h"
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: ev_handler                                                  *
+ *                                                                            *
+ * PURPOSE: Callback function that is called when the HTTP request has a      *
+ *          change in state. A typical implementation of this function        *
+ *          will have a switch for the ev variable that changes throughout    *
+ *          the lifecycle of the HTTP request. The function then mutates the  *
+ *          user_data variable to store data more permanently, such as to a   *
+ *          FILE handle or a struct.                                          *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE           I/O DESCRIPTION                                    *
+ * -------- -------------- --- -----------                                    *
+ * nc        mg_connection  I  The current mg_connection struct for this      *
+ *                             request                                        *
+ * ev        int            I  The current state of the connection as defined *
+ *                             by mongoose.h                                  *
+ * ev_data   void *         I  Current event data, most likely a http_message *
+ * user_data void *         I  User supplied variable that can be mutated     *
+ *                             throughout different parts of the HTTP request *
+ *                             lifecycle                                      *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data)) {
     struct http_message *hm = (struct http_message *) ev_data;
     struct state *state = (struct state *) user_data;
@@ -59,6 +86,21 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
     }
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: ulwi_empty_state                                            *
+ *                                                                            *
+ * PURPOSE: Empties the state struct and frees all of its memory              *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE       I/O DESCRIPTION                                        *
+ * -------- ---------- --- -----------                                        *
+ * s        state *     I  The state struct variable to free                  *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void ulwi_empty_state(struct state *s)
 {
     s->progress = NONEXISTENT; /* Reset progress as this is a new request */
@@ -68,6 +110,21 @@ void ulwi_empty_state(struct state *s)
     mg_strfree(&s->content);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: ulwi_empty_request                                          *
+ *                                                                            *
+ * PURPOSE: Empties the http_request struct and frees all of its memory       *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE       I/O DESCRIPTION                                        *
+ * -------- ---------- --- -----------                                        *
+ * s        request *   I  The http_request struct variable to free           *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void ulwi_empty_request(struct http_request *r)
 {
     r->method = '\0';
@@ -77,6 +134,27 @@ void ulwi_empty_request(struct http_request *r)
     r->headers[0] = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: insert_field_http_request                                   *
+ *                                                                            *
+ * PURPOSE: Inserts a field of string-based data into a http_request struct.  *
+ *          This helper function was created to reduce duplicated code for    *
+ *          the CHR, HHR and PHR commands.                                    *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT     TYPE       I/O DESCRIPTION                                    *
+ * ------------ ---------- --- -----------                                    *
+ * type         http_data   I  The http_data enum that specifies the type of  *
+ *                             data to insert into the http_request struct    *
+ * line         mg_str      I  A mg_str portable string that specifies the    *
+ *                             data to insert into the http_request struct    *
+ * http_request http_array  O  The http_array struct to insert said data into *
+ *                                                                            *
+ * RETURNS: none                                                              *
+ *                                                                            *
+ *****************************************************************************/
 void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array)
 {
     const size_t parameter_len = line->len - 4;

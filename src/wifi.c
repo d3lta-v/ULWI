@@ -2,6 +2,24 @@
 
 #include "constants.h"
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: compare_larger_rssi                                         *
+ *                                                                            *
+ * PURPOSE: Compares two RSSIs and returns which is larger                    *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * s1,s2    void *   I  The mgos_wifi_scan_result structs to compare          *
+ *                                                                            *
+ * RETURNS: an integer representing which RSSI is larger. If the integer is   *
+ *          positive, s2 has a larger RSSI. If the integer is negative, s1    *
+ *          has a larger RSSI. If the integer is exactly 0, it means that     *
+ *          both RSSIs are identical.                                         *
+ *                                                                            *
+ *****************************************************************************/
 int compare_larger_rssi(const void *s1, const void *s2)
 {
   struct mgos_wifi_scan_result *e1 = (struct mgos_wifi_scan_result *)s1;

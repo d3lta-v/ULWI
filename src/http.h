@@ -33,8 +33,8 @@ struct http_request
 
 struct state
 {
-    enum request_progress progress;     /* Current progress of the request */
     int status;                         /* Request status (may be HTTP status as well) */
+    enum request_progress progress;     /* Current progress of the request */
     int64_t written;                    /* Number of bytes written */
     char headers[HTTP_RX_CONTENT_MAX];  /* Headers of the HTTP response */
     struct mbuf content_buffer;

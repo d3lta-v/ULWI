@@ -40,6 +40,25 @@ int split_parameter_string(char *target_str, const int max_params, const int max
     return max_param_counter;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: repl_str                                                    *
+ *                                                                            *
+ * PURPOSE: Replaces strings in a C char array string. 					      *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * str      char *   I  The string to replace strings for. This function will *
+ * 						not alter this string.								  *
+ * from     char *   I  The target string to replace from.					  *
+ * to       char *   I  The target string to replace to.					  *
+ *                                                                            *
+ * RETURNS: a char pointer that refers to a string. Needs to be manually      *
+ * 			freed by calling free() on the pointer.                           *
+ *                                                                            *
+ *****************************************************************************/
 char *repl_str(const char *str, const char *from, const char *to)
 {
 	/* Adjust each of the below values to suit your needs. */
