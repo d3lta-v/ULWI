@@ -4,7 +4,7 @@ This document provides an outline of the instruction set, version 1.0-alpha1. Al
 
 If you are confused about what this instruction set is supposed to do, please read the original [README](README.md) document.
 
-All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To process messages involving multiple lines, please use UNIX style line endings (`\n`).
+All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To work with messages involving multiple lines, please use UNIX style line endings (`\n`).
 
 In addition, all parameters are delimited with the ASCII Unit Separator control character (0x1F) to avoid excessive use of escape characters or sequences. **This character is represented by the vertical bar character (|) in the rest of this manual.**
 
@@ -196,7 +196,7 @@ HTTP method types:
 - `<S/H/C>`: Status, Headers, Content
 - `<T/F>`: True to delete the result, False to keep the result in the ESP8266
 
-**Returns**: No reply if the HTTP request handle is invalid, or that the request has not yet been completed or has failed. Replies with the status (e.g. `200`) if second parameter is `S`, replies with all the headers if second parameter is `H` and replies with the content of the response if second parameter is `C`.
+**Returns**: Replies with "U" if the HTTP request handle is invalid or is not available for reading. Replies with the status (e.g. `200`) if second parameter is `S`, replies with all the headers if second parameter is `H` and replies with the content of the response if second parameter is `C`.
 
 ### Get HTTP Response Content as JSON
 

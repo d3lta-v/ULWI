@@ -167,6 +167,23 @@ int get_available_handle(struct http_request * request_array)
     return i;
 }
 
+bool is_state_handle_readable(struct state * state_array, int handle)
+{
+    /* First stage of handle validation, if the handle is within parameters */
+    if (handle < 0 || handle > HTTP_HANDLES_MAX)
+    {
+        return false;
+    }
+
+    /* Second stage, check if handle is not used. If it's not used, it's not readable */
+    if (state_array[handle].status == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 /******************************************************************************
  *                                                                            *
  * FUNCTION NAME: insert_field_http_request                                   *

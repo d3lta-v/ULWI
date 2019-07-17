@@ -288,7 +288,7 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                     if (param_counter == max_param_count)
                     {
-                        /* Empty state */
+                        /* Ensure that the relevant state struct is empty before finishing */
                         ulwi_empty_state(state);
                         mgos_uart_printf(UART_NO, "%i\r\n", handle);
                         LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
@@ -462,36 +462,41 @@ static void uart_dispatcher(int uart_no, void *arg)
                 LOG(LL_INFO, ("GHR param count: %d", param_counter));
                 if (param_counter == max_param_count)
                 {
-                    /* Correct number of arguments */
-                    /* TODO: add argument checking logic here, such as validating the handle */
-
-                    struct state *http_response = &state_array[handle];
-
-                    switch (command_type)
+                    /* Correct number of arguments, validate the handle */
+                    if (is_state_handle_readable(state_array, handle) == true)
                     {
-                    case STATE:
-                        /* Get state */
-                        mgos_uart_printf(UART_NO, "%c\r\n", (char)http_response->progress);
-                        break;
-                    case HEADER:
-                        /* Get headers of the HTTP response */
-                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->headers);
-                        break;
-                    case CONTENT:
-                        /* Get content of the HTTP response */
-                        /* TODO: Ensure proper null termination here */
-                        mgos_uart_printf(UART_NO, "%s\r\n", http_response->content.p);
-                        break;
-                    default:
-                        break;
+                        struct state *http_response = &state_array[handle];
+
+                        switch (command_type)
+                        {
+                        case STATE:
+                            /* Get state */
+                            mgos_uart_printf(UART_NO, "%c\r\n", (char)http_response->progress);
+                            break;
+                        case HEADER:
+                            /* Get headers of the HTTP response */
+                            mgos_uart_printf(UART_NO, "%s\r\n", http_response->headers);
+                            break;
+                        case CONTENT:
+                            /* Get content of the HTTP response */
+                            /* TODO: Ensure proper null termination here */
+                            mgos_uart_printf(UART_NO, "%s\r\n", http_response->content.p);
+                            break;
+                        default:
+                            break;
+                        }
+
+                        /* See whether or not to purge the request */
+                        if (purge == ULWI_TRUE)
+                        {
+                            /* Purge said request */
+                            ulwi_empty_state(http_response);
+                            ulwi_empty_request(&http_array[handle]);
+                        }
                     }
-
-                    /* See whether or not to purge the request */
-                    if (purge == ULWI_TRUE)
+                    else
                     {
-                        /* Purge said request */
-                        ulwi_empty_state(http_response);
-                        ulwi_empty_request(&http_array[handle]);
+                        mgos_uart_printf(UART_NO, "U\r\n");
                     }
                 }
                 else
