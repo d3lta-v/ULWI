@@ -53,7 +53,11 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
             // strncat(state->content, hm->body.p, hm->body.len);
             mbuf_append(&state->content_buffer, hm->body.p, hm->body.len);
         }
-        /* TODO: show error upon detecting that total_len exceeded HTTP_RX_CONTENT_MAX! */
+        else
+        {
+            LOG(LL_WARN, ("Warning: total length of HTTP content exceeded HTTP_RX_CONTENT_MAX"));
+            /* TODO: show error upon detecting that total_len exceeded HTTP_RX_CONTENT_MAX! */
+        }
         nc->flags |= MG_F_DELETE_CHUNK; /* delete chunk right after it's read to conserve heap memory */
         break;
     }
@@ -132,6 +136,35 @@ void ulwi_empty_request(struct http_request *r)
     r->params[0] = '\0';
     r->content[0] = '\0';
     r->headers[0] = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: get_available_handle                                        *
+ *                                                                            *
+ * PURPOSE: Gets the next available HTTP handle for ULWI                      *
+ *                                                                            *
+ * ARGUMENTS: none                                                            *
+ *                                                                            *
+ * RETURNS: an integer representing the index of the next available HTTP      *
+ *          handle, or -1 if there are no handles available                   *
+ *                                                                            *
+ *****************************************************************************/
+int get_available_handle(struct http_request * request_array)
+{
+    size_t i;
+    for (i = 0; i < HTTP_HANDLES_MAX; i++)
+    {
+        if (request_array[i].method == '\0')
+        {
+            break;
+        }
+    }
+    if (i == HTTP_HANDLES_MAX)
+    {
+        return -1;
+    }
+    return i;
 }
 
 /******************************************************************************

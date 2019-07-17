@@ -262,43 +262,50 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
-                /* TODO: fetch correct handle based on availablility, or return nothing
-                         if we ran out of handles to issue */
-                const int handle = 0;
-                struct http_request *request = &http_array[handle];
-                struct state *state = &state_array[handle];
+                const int handle = get_available_handle(http_array);
 
-                char *token = strtok(parameter_c_str, ULWI_DELIMITER);
-                int param_counter = 0;
-                while (token != NULL && param_counter < max_param_count)
+                if (handle != -1) /* Check if handle exists */
                 {
-                    switch (param_counter)
+                    struct http_request *request = &http_array[handle];
+                    struct state *state = &state_array[handle];
+
+                    char *token = strtok(parameter_c_str, ULWI_DELIMITER);
+                    int param_counter = 0;
+                    while (token != NULL && param_counter < max_param_count)
                     {
-                    case 0:
-                        request->method = token[0];
-                        break;
-                    case 1:
-                        strcpy(request->url, token);
-                        break;
+                        switch (param_counter)
+                        {
+                        case 0:
+                            request->method = token[0];
+                            break;
+                        case 1:
+                            strcpy(request->url, token);
+                            break;
+                        }
+                        token = strtok(NULL, ULWI_DELIMITER);
+                        param_counter++;
                     }
-                    token = strtok(NULL, ULWI_DELIMITER);
-                    param_counter++;
-                }
 
-                if (param_counter == max_param_count)
-                {
-                    /* Empty state */
-                    ulwi_empty_state(state);
-                    mgos_uart_printf(UART_NO, "%i\r\n", handle);
-                    LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
+                    if (param_counter == max_param_count)
+                    {
+                        /* Empty state */
+                        ulwi_empty_state(state);
+                        mgos_uart_printf(UART_NO, "%i\r\n", handle);
+                        LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
+                    }
+                    else
+                    {
+                        /* Reset request if there are not enough parameters given,
+                        reason being that the request is filled before checking
+                        for max parameter count */
+                        ulwi_empty_request(request);
+                        mgos_uart_printf(UART_NO, "short\r\n");
+                    }
                 }
                 else
                 {
-                    /* Reset request if there are not enough parameters given,
-                       reason being that the request is filled before checking
-                       for max parameter count */
-                    ulwi_empty_request(request);
-                    mgos_uart_printf(UART_NO, "short\r\n");
+                    /* Failed to create handle, most likely it ran out */
+                    mgos_uart_printf(UART_NO, "U\r\n");
                 }
             }
             else

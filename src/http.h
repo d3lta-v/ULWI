@@ -44,6 +44,7 @@ struct state
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
 
 void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array);
+int get_available_handle(struct http_request * request_array);
 void ulwi_empty_state(struct state *s);
 void ulwi_empty_request(struct http_request *r);
 
