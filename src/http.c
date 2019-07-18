@@ -210,14 +210,14 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
     const size_t parameter_len = line->len - 4;
     if (parameter_len > 0 && parameter_len < 2 + HTTP_TX_CONTENT_MAX)
     {
-        char parameter_c_str[2+HTTP_TX_CONTENT_MAX] = "";
-        strlcpy(parameter_c_str, line->p+4, parameter_len);
+        struct mg_str parameters_string = mg_strdup_nul(mg_mk_str_n(line->p+4, line->len-4));
 
         char raw_handle[2] = "";
         int handle = 0;
-        // struct state *state = &state_array[handle];
 
-        char *token = strtok(parameter_c_str, ULWI_DELIMITER);
+        char *mutable_pointer = (char *)parameters_string.p; /* Explicit cast from const pointer to non-const. Hacky?? */
+
+        char *token = strtok(mutable_pointer, ULWI_DELIMITER);
         int param_counter = 0;
         const int max_param_count = 2;
         while (token != NULL && param_counter < max_param_count)
@@ -271,6 +271,8 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
             token = strtok(NULL, ULWI_DELIMITER);
             param_counter++;
         }
+
+        mg_strfree(&parameters_string);
 
         if (handle == -1)
         {

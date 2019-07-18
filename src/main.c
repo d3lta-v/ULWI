@@ -262,9 +262,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
-                const int handle = get_available_handle(http_array);
+                const int handle = get_available_handle(http_array); /* Returns -1 if no handle available */
 
-                if (handle != -1) /* Check if handle exists */
+                if (handle != -1)
                 {
                     struct http_request *request = &http_array[handle];
                     struct state *state = &state_array[handle];
