@@ -227,17 +227,25 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
             case 0:
                 strncpy(raw_handle, token, 1);
                 raw_handle[1] = '\0'; /* Forcibly null terminate it */
-                handle = atoi(raw_handle);
-                if (handle >= HTTP_HANDLES_MAX || handle < 0)
+                /* TODO: refactor handle validation into a single function */
+                if (isdigit(raw_handle[0]))
                 {
-                    /* Perform basic validation of handle */
-                    handle = -1; /* invalidate the handle */
+                    handle = atoi(raw_handle);
+                    if (handle >= HTTP_HANDLES_MAX || handle < 0)
+                    {
+                        /* Perform basic validation of handle */
+                        handle = -1; /* invalidate the handle */
+                    }
+                    else if (http_array[handle].method == '\0')
+                    {
+                        /* Perform deep validation of handle if it passed basic */
+                        /* If method is null ('\0'), it means that this handle does not exist */
+                        handle = -1; /* invalidate the handle */
+                    }
                 }
-                else if (http_array[handle].method == '\0')
+                else
                 {
-                    /* Perform deep validation of handle if it passed basic */
-                    /* If method is null ('\0'), it means that this handle does not exist */
-                    handle = -1; /* invalidate the handle */
+                    handle = -1;
                 }
                 break;
             case 1:
