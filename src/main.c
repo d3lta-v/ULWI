@@ -402,10 +402,6 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[16] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1); /* +1 for null termination */
 
-                // const int handle = 0;
-                // struct http_request *request = &http_array[handle];
-                // struct state *state = &state_array[handle];
-
                 int handle = -1;
                 enum http_data command_type;
                 enum boolean purge;
@@ -518,6 +514,40 @@ static void uart_dispatcher(int uart_no, void *arg)
             else
             {
                 mgos_uart_printf(UART_NO, "long\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_DHR) && line.len > 4)
+        {
+            /* Delete HTTP Request */
+            const size_t parameter_len = line.len - 4;
+            if (parameter_len > 0 && parameter_len < 2)
+            {
+                char parameter_c_str[2] = {0};
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+
+                const size_t handle = atoi(parameter_c_str);
+                if (handle < HTTP_HANDLES_MAX)
+                {
+                    struct http_request *request = &http_array[handle];
+                    struct state *state = &state_array[handle];
+
+                    /* Check if handle number is pointing to an populated handle */
+                    if (request->method || state->status != 0)
+                    {
+                        ulwi_empty_request(request);
+                        ulwi_empty_state(state);
+                        mgos_uart_printf(UART_NO, "\r\n");
+                    }
+                    else
+                    {
+                        mgos_uart_printf(UART_NO, "U\r\n");
+                    }
+                }
+                else
+                {
+                    /* Handle count is way too high and will result in undefined behaviour */
+                    mgos_uart_printf(UART_NO, "U\r\n");
+                }   
             }
         }
         else

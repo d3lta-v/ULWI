@@ -50,5 +50,6 @@ static const struct mg_str COMMAND_HHR = MG_MK_STR("hhr");
 static const struct mg_str COMMAND_THR = MG_MK_STR("thr");
 static const struct mg_str COMMAND_SHR = MG_MK_STR("shr");
 static const struct mg_str COMMAND_GHR = MG_MK_STR("ghr");
+static const struct mg_str COMMAND_DHR = MG_MK_STR("dhr");
 
 #endif

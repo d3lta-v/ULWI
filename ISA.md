@@ -210,16 +210,16 @@ HTTP method types:
 
 **Returns**: WIP
 
-### Purge HTTP Response
+### Delete HTTP Response
 
-**Command**: `phr <http request handle>`  
+**Command**: `dhr <http request handle>`  
 **Type**: Reply  
 **Purpose**: Frees the RAM taken by a HTTP response on the ESP8266 while freeing up the handle as well to be used by other HTTP requests  
 **Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
-**Returns**: `\r\n` if command was executed successfully
+**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
 
 ### Terminate HTTP request
 
