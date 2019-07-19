@@ -156,43 +156,55 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_CAP) && line.len > 4)
         {
             const size_t parameter_len = line.len - 4;
-            char parameter_c_str[177] = {0}; /* 128 + 16*3 + null termination char */
-            strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 177);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[177] = {0}; /* 128 + 16*3 + null termination char */
+                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
 
-            const int max_params = 5;
-            const int max_param_count = 65;
-            char result[max_params][max_param_count];
+                const int max_params = 5;
+                const int max_param_count = 65;
+                char result[max_params][max_param_count];
 
-            const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_count, result);
-            
-            if (param_len == 2)
-            {
-                const struct mgos_config_wifi_sta wifi_config = 
-                { 
-                    .enable = true, 
-                    .ssid = result[0], 
-                    .pass = result[1]
-                };
-                mgos_wifi_setup_sta(&wifi_config);
-                mgos_uart_printf(UART_NO, "\r\n");
+                const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_count, result);
+                
+                if (param_len == 2)
+                {
+                    const struct mgos_config_wifi_sta wifi_config = 
+                    { 
+                        .enable = true, 
+                        .ssid = result[0], 
+                        .pass = result[1]
+                    };
+                    mgos_wifi_setup_sta(&wifi_config);
+                    mgos_uart_printf(UART_NO, "\r\n");
+                }
+                else if (param_len == 5)
+                {
+                    const struct mgos_config_wifi_sta wifi_config = 
+                    { 
+                        .enable = true,
+                        .ssid = result[0],
+                        .pass = result[1],
+                        .ip = result[2],
+                        .gw = result[3],
+                        .netmask = result[4]
+                    };
+                    mgos_wifi_setup_sta(&wifi_config);
+                    mgos_uart_printf(UART_NO, "\r\n");
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "invalid\r\n");
+                }
             }
-            else if (param_len == 5)
+            else if (str_state == STRING_LONG)
             {
-                const struct mgos_config_wifi_sta wifi_config = 
-                { 
-                    .enable = true,
-                    .ssid = result[0],
-                    .pass = result[1],
-                    .ip = result[2],
-                    .gw = result[3],
-                    .netmask = result[4]
-                };
-                mgos_wifi_setup_sta(&wifi_config);
-                mgos_uart_printf(UART_NO, "\r\n");
+                mgos_uart_printf(UART_NO, "long\r\n");
             }
-            else
+            else if (str_state == STRING_SHORT)
             {
-                mgos_uart_printf(UART_NO, "invalid\r\n");
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else if (mg_str_starts_with(line, COMMAND_SAP) && line.len == 3)
@@ -257,7 +269,8 @@ static void uart_dispatcher(int uart_no, void *arg)
             /* Initialise HTTP Request */
             const size_t parameter_len = line.len - 4;
             const int max_param_count = 2;
-            if (parameter_len < 258)
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 258);
+            if (str_state == STRING_OK)
             {
                 char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
@@ -308,9 +321,13 @@ static void uart_dispatcher(int uart_no, void *arg)
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }
             }
-            else
+            else if (str_state == STRING_LONG)
             {
                 mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else if (mg_str_starts_with(line, COMMAND_PHR) && line.len > 4)
@@ -332,7 +349,8 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             /* Transmit HTTP request */
             const size_t parameter_len = line.len - 4;
-            if (parameter_len > 0 && parameter_len < 2)
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
@@ -362,16 +380,21 @@ static void uart_dispatcher(int uart_no, void *arg)
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }   
             }
-            else
+            else if (str_state == STRING_LONG)
             {
                 mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else if (mg_str_starts_with(line, COMMAND_SHR) && line.len > 4)
         {
             /* Status of HTTP request */
             const size_t parameter_len = line.len - 4;
-            if (parameter_len > 0 && parameter_len < 2)
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
@@ -385,19 +408,24 @@ static void uart_dispatcher(int uart_no, void *arg)
                 else
                 {
                     /* Handle count is way too high and definitely does not exist */
-                    mgos_uart_printf(UART_NO, "N\r\n");
+                    mgos_uart_printf(UART_NO, "U\r\n");
                 }  
             }
-            else
+            else if (str_state == STRING_LONG)
             {
                 mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else if (mg_str_starts_with(line, COMMAND_GHR) && line.len > 4)
         {
             /* Get HTTP request */
             const size_t parameter_len = line.len - 4;
-            if (parameter_len > 0 && parameter_len < 16)
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 16);
+            if (str_state == STRING_OK)
             {
                 char parameter_c_str[16] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1); /* +1 for null termination */
@@ -499,28 +527,22 @@ static void uart_dispatcher(int uart_no, void *arg)
                 {
                     mgos_uart_printf(UART_NO, "short\r\n");
                 }
-                // const size_t handle = atoi(parameter_c_str);
-                // if (handle < HTTP_HANDLES_MAX)
-                // {
-                //     struct state *state = &state_array[handle];
-                //     mgos_uart_printf(UART_NO, "%c\r\n", (char)state->progress);
-                // }
-                // else
-                // {
-                //     /* Handle count is way too high and definitely does not exist */
-                //     mgos_uart_printf(UART_NO, "N\r\n");
-                // }  
             }
-            else
+            else if (str_state == STRING_LONG)
             {
                 mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else if (mg_str_starts_with(line, COMMAND_DHR) && line.len > 4)
         {
             /* Delete HTTP Request */
             const size_t parameter_len = line.len - 4;
-            if (parameter_len > 0 && parameter_len < 2)
+            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
                 strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
@@ -548,6 +570,14 @@ static void uart_dispatcher(int uart_no, void *arg)
                     /* Handle count is way too high and will result in undefined behaviour */
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }   
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
         else

@@ -141,3 +141,19 @@ end_repl_str:
 	free(pos_cache);
 	return ret;
 }
+
+enum str_len_state ulwi_validate_strlen(size_t length, size_t lower, size_t upper)
+{
+	if (length > lower && length < upper)
+	{
+		return STRING_OK;
+	}
+	else if (length <= lower)
+	{
+		return STRING_SHORT;
+	}
+	else
+	{
+		return STRING_LONG;
+	}
+}

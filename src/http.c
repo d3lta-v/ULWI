@@ -208,7 +208,8 @@ bool is_state_handle_readable(struct state * state_array, int handle)
 void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array)
 {
     const size_t parameter_len = line->len - 4;
-    if (parameter_len > 0 && parameter_len < 2 + HTTP_TX_CONTENT_MAX)
+    const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2 + HTTP_TX_CONTENT_MAX);
+    if (str_state == STRING_OK)
     {
         struct mg_str parameters_string = mg_strdup_nul(mg_mk_str_n(line->p+4, line->len-4));
 
@@ -287,8 +288,12 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
             mgos_uart_printf(UART_NO, "U\r\n");
         }
     }
-    else
+    else if (str_state == STRING_LONG)
     {
         mgos_uart_printf(UART_NO, "long\r\n");
+    }
+    else if (str_state == STRING_SHORT)
+    {
+        mgos_uart_printf(UART_NO, "short\r\n");
     }
 }
