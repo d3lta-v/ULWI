@@ -228,7 +228,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                 strncpy(raw_handle, token, 1);
                 raw_handle[1] = '\0'; /* Forcibly null terminate it */
                 /* TODO: refactor handle validation into a single function */
-                if (isdigit(raw_handle[0]))
+                if (isdigit((int)raw_handle[0]))
                 {
                     handle = atoi(raw_handle);
                     if (handle >= HTTP_HANDLES_MAX || handle < 0)

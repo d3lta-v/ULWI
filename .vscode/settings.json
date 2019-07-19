@@ -5,7 +5,8 @@
         "*.h": "c",
         "locale": "c",
         "string": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "__locale": "c"
     },
     "mos.port": ""
 }
