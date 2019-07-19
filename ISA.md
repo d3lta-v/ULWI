@@ -220,12 +220,3 @@ HTTP method types:
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
 **Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
-
-### Terminate HTTP request
-
-**Command**: `thr <http request handle>`  
-**Type**: Action  
-**Purpose**: Terminates a HTTP request.  
-**Parameters**:
-
-- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
