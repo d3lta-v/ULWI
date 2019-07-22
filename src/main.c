@@ -144,7 +144,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_VER) && line.len == 3)
         {
             mgos_uart_printf(UART_NO, "v1.0-alpha1\r\n");
-        } 
+        }
         else if (mg_str_starts_with(line, COMMAND_RST) && line.len == 3)
         {
             mgos_system_restart();
@@ -153,14 +153,15 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             mgos_wifi_scan(wifi_scan_cb, NULL);
         }
-        else if (mg_str_starts_with(line, COMMAND_CAP) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_CAP))
         {
-            const size_t parameter_len = line.len - 4;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 177);
+            const size_t min_len = 4;               /* 3 for command, 1 space */
+            const size_t max_len = min_len + 255;
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, min_len, max_len);
             if (str_state == STRING_OK)
             {
-                char parameter_c_str[177] = {0}; /* 128 + 16*3 + null termination char */
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+                char parameter_c_str[256] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
                 const int max_params = 5;
                 const int max_param_count = 65;
@@ -264,16 +265,17 @@ static void uart_dispatcher(int uart_no, void *arg)
             mgos_net_ip_to_str(&ip_information.ip, ip);
             mgos_uart_printf(UART_NO, "%s\r\n", ip);
         }
-        else if (mg_str_starts_with(line, COMMAND_IHR) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_IHR))
         {
             /* Initialise HTTP Request */
-            const size_t parameter_len = line.len - 4;
             const int max_param_count = 2;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 258);
+            const size_t min_len = 4;
+            const size_t max_len = min_len + 258;
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, min_len, max_len);
             if (str_state == STRING_OK)
             {
                 char parameter_c_str[258] = {0}; /* 1 (Get/Post) + 255 (URL length) + 2 null termination */
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
                 const int handle = get_available_handle(http_array); /* Returns -1 if no handle available */
 
@@ -345,15 +347,14 @@ static void uart_dispatcher(int uart_no, void *arg)
             /* Header of HTTP request */
             insert_field_http_request(HEADER, &line, http_array);
         }
-        else if (mg_str_starts_with(line, COMMAND_THR) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_THR))
         {
             /* Transmit HTTP request */
-            const size_t parameter_len = line.len - 4;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5);
             if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
                 const size_t handle = atoi(parameter_c_str);
                 if (handle < HTTP_HANDLES_MAX)
@@ -389,16 +390,16 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
-        else if (mg_str_starts_with(line, COMMAND_SHR) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_SHR))
         {
             /* Status of HTTP request */
-            const size_t parameter_len = line.len - 4;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5);
             if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
+                /* TODO: atoi isdigit() validation first */
                 const size_t handle = atoi(parameter_c_str);
                 if (handle < HTTP_HANDLES_MAX)
                 {
@@ -420,15 +421,14 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
-        else if (mg_str_starts_with(line, COMMAND_GHR) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_GHR))
         {
             /* Get HTTP request */
-            const size_t parameter_len = line.len - 4;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 16);
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 9, 9);
             if (str_state == STRING_OK)
             {
-                char parameter_c_str[16] = {0};
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1); /* +1 for null termination */
+                char parameter_c_str[6] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
                 int handle = -1;
                 enum http_data command_type;
@@ -443,6 +443,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                     case 0:
                         /* Handle */
+                        /* TODO: atoi validation */
                         handle = atoi(token);
                         LOG(LL_INFO, ("GHR handle parsed: %d", handle));
                         break;
@@ -537,16 +538,16 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
-        else if (mg_str_starts_with(line, COMMAND_DHR) && line.len > 4)
+        else if (mg_str_starts_with(line, COMMAND_DHR))
         {
             /* Delete HTTP Request */
-            const size_t parameter_len = line.len - 4;
-            const enum str_len_state str_state = ulwi_validate_strlen(parameter_len, 0, 2);
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5);
             if (str_state == STRING_OK)
             {
                 char parameter_c_str[2] = {0};
-                strlcpy(parameter_c_str, line.p+4, parameter_len + 1);
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
+                /* TODO: atoi validation */
                 const size_t handle = atoi(parameter_c_str);
                 if (handle < HTTP_HANDLES_MAX)
                 {

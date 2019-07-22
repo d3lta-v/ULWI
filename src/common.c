@@ -142,13 +142,35 @@ end_repl_str:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: ulwi_validate_strlen                                        *
+ *                                                                            *
+ * PURPOSE: Validates a string length by checking the raw length integer	  *
+ * 			against an upper and a lower boundary. 							  *
+ * 																			  *
+ * NOTE: `mg_str` lengths typically do not include null termination			  *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * length   size_t   I  The length of the string to check					  *
+ * lower    size_t   I  Lower boundary (inclusive) length to check for		  *
+ * upper    size_t   I  Upper boundary (inclusive) length to check for		  *
+ *                                                                            *
+ * RETURNS: a str_len_state enum that indicates that the string is within	  *
+ * 			acceptable margins (STRING_OK), too short (STRING_SHORT) or too	  *
+ * 			long (STRING_LONG).												  *
+ *                                                                            *
+ *****************************************************************************/
 enum str_len_state ulwi_validate_strlen(size_t length, size_t lower, size_t upper)
 {
-	if (length > lower && length < upper)
+	if (length >= lower && length <= upper)
 	{
 		return STRING_OK;
 	}
-	else if (length <= lower)
+	else if (length < lower)
 	{
 		return STRING_SHORT;
 	}
@@ -156,4 +178,38 @@ enum str_len_state ulwi_validate_strlen(size_t length, size_t lower, size_t uppe
 	{
 		return STRING_LONG;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: ulwi_cpy_params_only                                        *
+ *                                                                            *
+ * PURPOSE: Almost functionally identical to strlcpy, except that it only	  *
+ * 			copies the parameters from a command to a C style string. This	  *
+ * 			function accomplishes this by advancing the source pointer by 4   *
+ * 			indices (which covers the first 3 characters of the command + a	  *
+ * 			space), and by reducing the maximum length by 3 (from the 4		  *
+ * 			deducted characters minus 1 null termination char). This function *
+ * 			performs NO bounds checking and it must be done elsewhere!		  *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT TYPE    I/O DESCRIPTION                                           *
+ * -------- ------- --- -----------                                           *
+ * target   char *   O  The target to copy the string _to_					  *
+ * source   char *   I  The place to copy the string _from_				      *
+ * len      size_t   I  The length of the entire command, not just the params *
+ *                                                                            *
+ * RETURNS: a boolean indicating whether the copy was successful			  *
+ *                                                                            *
+ *****************************************************************************/
+bool ulwi_cpy_params_only(char *target, const char *source, const size_t len)
+{
+	if (len <= 3)
+	{
+		/* Not enough characters to copy */
+		return false;
+	}
+	strlcpy(target, source + 4, len - 3); /* length is reduced by 3 because of the command length of 3 */
+	return true;
 }
