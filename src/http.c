@@ -214,7 +214,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
         struct mg_str parameters_string = mg_strdup_nul(mg_mk_str_n(line->p+4, line->len-4));
 
         char raw_handle[2] = "";
-        int handle = 0;
+        int handle = -1;
 
         char *mutable_pointer = (char *)parameters_string.p; /* Explicit cast from const pointer to non-const. Hacky?? */
 
@@ -228,26 +228,7 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
             case 0:
                 strncpy(raw_handle, token, 1);
                 raw_handle[1] = '\0'; /* Forcibly null terminate it */
-                /* TODO: refactor handle validation into a single function */
-                if (isdigit((int)raw_handle[0]))
-                {
-                    handle = atoi(raw_handle);
-                    if (handle >= HTTP_HANDLES_MAX || handle < 0)
-                    {
-                        /* Perform basic validation of handle */
-                        handle = -1; /* invalidate the handle */
-                    }
-                    else if (http_array[handle].method == '\0')
-                    {
-                        /* Perform deep validation of handle if it passed basic */
-                        /* If method is null ('\0'), it means that this handle does not exist */
-                        handle = -1; /* invalidate the handle */
-                    }
-                }
-                else
-                {
-                    handle = -1;
-                }
+                handle = validate_handle_string(raw_handle);
                 break;
             case 1:
                 /* Copy the parameters over */
