@@ -356,8 +356,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[2] = {0};
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
-                const size_t handle = atoi(parameter_c_str);
-                if (handle < HTTP_HANDLES_MAX)
+                const int handle = validate_handle_string(parameter_c_str);
+                if (handle >= 0)
                 {
                     struct http_request *request = &http_array[handle];
                     struct state *state = &state_array[handle];
@@ -377,7 +377,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 }
                 else
                 {
-                    /* Handle count is way too high and will result in undefined behaviour */
+                    /* Invalid handle */
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }   
             }
@@ -399,16 +399,15 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[2] = {0};
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
-                /* TODO: atoi isdigit() validation first */
-                const size_t handle = atoi(parameter_c_str);
-                if (handle < HTTP_HANDLES_MAX)
+                const int handle = validate_handle_string(parameter_c_str);
+                if (handle >= 0)
                 {
                     struct state *state = &state_array[handle];
                     mgos_uart_printf(UART_NO, "%c\r\n", (char)state->progress);
                 }
                 else
                 {
-                    /* Handle count is way too high and definitely does not exist */
+                    /* Invalid handle */
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }  
             }
@@ -443,8 +442,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                     case 0:
                         /* Handle */
-                        /* TODO: atoi validation */
-                        handle = atoi(token);
+                        handle = validate_handle_string(token);
                         LOG(LL_INFO, ("GHR handle parsed: %d", handle));
                         break;
                     case 1:
@@ -487,7 +485,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 LOG(LL_INFO, ("GHR param count: %d", param_counter));
                 if (param_counter == max_param_count)
                 {
-                    /* Correct number of arguments, validate the handle */
+                    /* Correct number of arguments, validate the handle again but this time through checking if state is available to read from */
                     if (is_state_handle_readable(state_array, handle) == true)
                     {
                         struct state *http_response = &state_array[handle];
@@ -547,9 +545,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                 char parameter_c_str[2] = {0};
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
-                /* TODO: atoi validation */
-                const size_t handle = atoi(parameter_c_str);
-                if (handle < HTTP_HANDLES_MAX)
+                const int handle = validate_handle_string(parameter_c_str);
+                if (handle >= 0)
                 {
                     struct http_request *request = &http_array[handle];
                     struct state *state = &state_array[handle];
@@ -568,7 +565,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 }
                 else
                 {
-                    /* Handle count is way too high and will result in undefined behaviour */
+                    /* Invalid handle */
                     mgos_uart_printf(UART_NO, "U\r\n");
                 }   
             }

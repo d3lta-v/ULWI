@@ -49,5 +49,6 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
 int get_available_handle(struct http_request * request_array);
 void ulwi_empty_state(struct state *s);
 void ulwi_empty_request(struct http_request *r);
+int validate_handle_string(char *handle_char);
 
 #endif

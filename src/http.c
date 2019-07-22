@@ -297,3 +297,54 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
         mgos_uart_printf(UART_NO, "short\r\n");
     }
 }
+
+/******************************************************************************
+ *                                                                            *
+ * FUNCTION NAME: validate_handle_string                                      *
+ *                                                                            *
+ * PURPOSE: Validates a HTTP handle from a C-style string (char pointer).     *
+ *          This function takes care of checking if the string is properly    *
+ *          terminated and can be converted, and performs basic bounds        *
+ *          checking afterwards to make sure that the string does describe a  *
+ *          handle that exists.                                               *
+ *                                                                            *
+ * ARGUMENTS:                                                                 *
+ *                                                                            *
+ * ARGUMENT     TYPE       I/O DESCRIPTION                                    *
+ * ------------ ---------- --- -----------                                    *
+ * handle_char  char *      I  The HTTP handle as a C-style string (char *)   *
+ *                                                                            *
+ * RETURNS: The handle as a positive integer if valid, -1 if invalid          *
+ *                                                                            *
+ *****************************************************************************/
+int validate_handle_string(char *handle_char)
+{
+    size_t i = 0;
+    bool digit_check = true;
+    char current_char = '0';
+
+    /* Check if handle is within 3 characters excluding null termination and
+       all characters are digits */
+    while (current_char != '\0' && i < 4)
+    {
+        current_char = *(handle_char + i);
+        if (!isdigit((int)current_char))
+        {
+            digit_check = false;
+        }
+        i++;
+    }
+    if (current_char != '\0' || digit_check == false)
+    {
+        return -1;
+    }
+
+    int handle_integer = atoi(handle_char);
+
+    /* Check if converted handle is within limits */
+    if (handle_integer < 0 || handle_integer > HTTP_HANDLES_MAX)
+    {
+        return -1;
+    }
+    return handle_integer;
+}
