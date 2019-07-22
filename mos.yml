@@ -22,7 +22,8 @@ filesystem:
 # Below is a custom firmware configuration example.
 # Uncomment and modify according to your needs:
 
-# config_schema:
+config_schema:
+  - ["wifi.ap.enable", false]
 #  - ["my_app", "o", {title: "My app custom settings"}]
 #  - ["my_app.bool_value", "b", false, {title: "Some boolean value"}]
 #  - ["my_app.string_value", "s", "", {title: "Some string value"}]
