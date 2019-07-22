@@ -32,26 +32,26 @@
  *****************************************************************************/
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data)) {
     struct http_message *hm = (struct http_message *) ev_data;
-    struct state *state = (struct state *) user_data;
+    struct http_response *response = (struct http_response *) user_data;
 
     switch (ev)
     {
     case MG_EV_CONNECT:
         /* System just established connection, integer should be 0 */
-        state->progress = IN_PROGRESS;
-        state->status = *(int *) ev_data;
+        response->progress = IN_PROGRESS;
+        response->status = *(int *) ev_data;
 
-        mbuf_init(&state->content_buffer, HTTP_RX_CONTENT_MAX);
+        mbuf_init(&response->content_buffer, HTTP_RX_CONTENT_MAX);
         break;
     case MG_EV_HTTP_CHUNK: {
         /* Chunked reply has arrived */
-        state->progress = IN_PROGRESS;
-        const size_t total_len = state->written + hm->body.len;
+        response->progress = IN_PROGRESS;
+        const size_t total_len = response->written + hm->body.len;
         if (total_len < HTTP_RX_CONTENT_MAX)
         {
-            state->written += hm->body.len;
-            // strncat(state->content, hm->body.p, hm->body.len);
-            mbuf_append(&state->content_buffer, hm->body.p, hm->body.len);
+            response->written += hm->body.len;
+            // strncat(response->content, hm->body.p, hm->body.len);
+            mbuf_append(&response->content_buffer, hm->body.p, hm->body.len);
         }
         else
         {
@@ -63,27 +63,27 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
     }
     case MG_EV_HTTP_REPLY:
         /* Server has completed the reply*/
-        state->status = hm->resp_code;
+        response->status = hm->resp_code;
         nc->flags |= MG_F_CLOSE_IMMEDIATELY;
         break;
     case MG_EV_CLOSE:
         /* Connection fully closed */
-        LOG(LL_INFO, ("status %d bytes %llu", state->status, state->written));
+        LOG(LL_INFO, ("status %d bytes %llu", response->status, response->written));
         /* Write buffer to string and discard buffer */
-        const struct mg_str temp_string = MG_MK_STR_N(state->content_buffer.buf, state->content_buffer.len);
-        mg_strfree(&state->content);
-        state->content = mg_strdup_nul(temp_string);
-        mbuf_free(&state->content_buffer);
-        if (state->status >= 200 && state->status < 300)
+        const struct mg_str temp_string = MG_MK_STR_N(response->content_buffer.buf, response->content_buffer.len);
+        mg_strfree(&response->content);
+        response->content = mg_strdup_nul(temp_string);
+        mbuf_free(&response->content_buffer);
+        if (response->status >= 200 && response->status < 300)
         {
-            state->progress = SUCCESS;
+            response->progress = SUCCESS;
         }
         else
         {
-            state->progress = FAILED;
-            LOG(LL_ERROR, ("Connection closed with error code: %d", state->status));
+            response->progress = FAILED;
+            LOG(LL_ERROR, ("Connection closed with error code: %d", response->status));
         }
-        /* NOTE: Manual memory management must be done to the state variable
+        /* NOTE: Manual memory management must be done to the response variable
            to prevent memory leaks. Alternatively, manual memory management
            is also possible */
         break;
@@ -92,20 +92,20 @@ void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *
 
 /******************************************************************************
  *                                                                            *
- * FUNCTION NAME: ulwi_empty_state                                            *
+ * FUNCTION NAME: ulwi_empty_response                                            *
  *                                                                            *
- * PURPOSE: Empties the state struct and frees all of its memory              *
+ * PURPOSE: Empties the http_response struct and frees all of its memory      *
  *                                                                            *
  * ARGUMENTS:                                                                 *
  *                                                                            *
- * ARGUMENT TYPE       I/O DESCRIPTION                                        *
- * -------- ---------- --- -----------                                        *
- * s        state *     I  The state struct variable to free                  *
+ * ARGUMENT TYPE            I/O DESCRIPTION                                   *
+ * -------- --------------- --- -----------                                   *
+ * s        http_response *  I  The state struct variable to free             *
  *                                                                            *
  * RETURNS: none                                                              *
  *                                                                            *
  *****************************************************************************/
-void ulwi_empty_state(struct state *s)
+void ulwi_empty_response(struct http_response *s)
 {
     s->progress = NONEXISTENT; /* Reset progress as this is a new request */
     s->status = 0;
@@ -167,7 +167,7 @@ int get_available_handle(struct http_request * request_array)
     return i;
 }
 
-bool is_state_handle_readable(struct state * state_array, int handle)
+bool response_handle_readable(struct http_response * response_array, int handle)
 {
     /* First stage of handle validation, if the handle is within parameters */
     if (handle < 0 || handle > HTTP_HANDLES_MAX)
@@ -176,7 +176,7 @@ bool is_state_handle_readable(struct state * state_array, int handle)
     }
 
     /* Second stage, check if handle is not used. If it's not used, it's not readable */
-    if (state_array[handle].status == 0)
+    if (response_array[handle].status == 0)
     {
         return false;
     }

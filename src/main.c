@@ -44,7 +44,7 @@
 #define DEVELOPMENT
 
 static struct http_request http_array[HTTP_HANDLES_MAX];
-static struct state state_array[HTTP_HANDLES_MAX];
+static struct http_response response_array[HTTP_HANDLES_MAX];
 
 #ifdef DEVELOPMENT
 /******************************************************************************
@@ -282,7 +282,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (handle != -1)
                 {
                     struct http_request *request = &http_array[handle];
-                    struct state *state = &state_array[handle];
+                    struct http_response *response = &response_array[handle];
 
                     char *token = strtok(parameter_c_str, ULWI_DELIMITER);
                     int param_counter = 0;
@@ -303,8 +303,8 @@ static void uart_dispatcher(int uart_no, void *arg)
 
                     if (param_counter == max_param_count)
                     {
-                        /* Ensure that the relevant state struct is empty before finishing */
-                        ulwi_empty_state(state);
+                        /* Ensure that the relevant http_response struct is empty before finishing */
+                        ulwi_empty_response(response);
                         mgos_uart_printf(UART_NO, "%i\r\n", handle);
                         LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
                     }
@@ -360,15 +360,15 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (handle >= 0)
                 {
                     struct http_request *request = &http_array[handle];
-                    struct state *state = &state_array[handle];
+                    struct http_response *response = &response_array[handle];
 
                     /* Check if handle refers to a null by checking the method char for the null char */
                     if (request->method)
                     {
-                        /* Clear the previous state */
-                        ulwi_empty_state(state);
+                        /* Clear the previous response */
+                        ulwi_empty_response(response);
                         LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url, request->params, request->content, request->headers));
-                        mg_connect_http(mgos_get_mgr(), &ev_handler, state, request->url, NULL, NULL);
+                        mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url, NULL, NULL);
                     }
                     else
                     {
@@ -402,8 +402,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                 const int handle = validate_handle_string(parameter_c_str);
                 if (handle >= 0)
                 {
-                    struct state *state = &state_array[handle];
-                    mgos_uart_printf(UART_NO, "%c\r\n", (char)state->progress);
+                    struct http_response *response = &response_array[handle];
+                    mgos_uart_printf(UART_NO, "%c\r\n", (char)response->progress);
                 }
                 else
                 {
@@ -486,14 +486,14 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (param_counter == max_param_count)
                 {
                     /* Correct number of arguments, validate the handle again but this time through checking if state is available to read from */
-                    if (is_state_handle_readable(state_array, handle) == true)
+                    if (response_handle_readable(response_array, handle) == true)
                     {
-                        struct state *http_response = &state_array[handle];
+                        struct http_response *http_response = &response_array[handle];
 
                         switch (command_type)
                         {
                         case STATE:
-                            /* Get state */
+                            /* Get http_response */
                             mgos_uart_printf(UART_NO, "%c\r\n", (char)http_response->progress);
                             break;
                         case HEADER:
@@ -513,7 +513,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         if (purge == ULWI_TRUE)
                         {
                             /* Purge said request */
-                            ulwi_empty_state(http_response);
+                            ulwi_empty_response(http_response);
                             ulwi_empty_request(&http_array[handle]);
                         }
                     }
@@ -549,13 +549,13 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (handle >= 0)
                 {
                     struct http_request *request = &http_array[handle];
-                    struct state *state = &state_array[handle];
+                    struct http_response *response = &response_array[handle];
 
                     /* Check if handle number is pointing to an populated handle */
-                    if (request->method || state->status != 0)
+                    if (request->method || response->status != 0)
                     {
                         ulwi_empty_request(request);
-                        ulwi_empty_state(state);
+                        ulwi_empty_response(response);
                         mgos_uart_printf(UART_NO, "\r\n");
                     }
                     else

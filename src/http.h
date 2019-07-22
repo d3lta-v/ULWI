@@ -31,7 +31,7 @@ struct http_request
     char headers[HTTP_TX_CONTENT_MAX];  /* HTTP headers of the request */
 };
 
-struct state
+struct http_response
 {
     int status;                         /* Request status (may be HTTP status as well) */
     enum request_progress progress;     /* Current progress of the request */
@@ -43,11 +43,11 @@ struct state
 
 void ev_handler(struct mg_connection *nc, int ev, void *ev_data MG_UD_ARG(void *user_data));
 
-bool is_state_handle_readable(struct state * state_array, int handle);
+bool response_handle_readable(struct http_response * response_array, int handle);
 
 void insert_field_http_request(enum http_data type, struct mg_str *line, struct http_request *http_array);
 int get_available_handle(struct http_request * request_array);
-void ulwi_empty_state(struct state *s);
+void ulwi_empty_response(struct http_response *s);
 void ulwi_empty_request(struct http_request *r);
 int validate_handle_string(char *handle_char);
 
