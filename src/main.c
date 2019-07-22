@@ -379,7 +379,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 {
                     /* Invalid handle */
                     mgos_uart_printf(UART_NO, "U\r\n");
-                }   
+                }
             }
             else if (str_state == STRING_LONG)
             {

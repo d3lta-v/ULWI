@@ -328,8 +328,10 @@ int validate_handle_string(char *handle_char)
     while (current_char != '\0' && i < 4)
     {
         current_char = *(handle_char + i);
-        if (!isdigit((int)current_char))
+        if (!isdigit((int)current_char) && current_char != '\0')
         {
+            /* as this function will eventually encounter a null character, 
+               we must ignore null characters when iterating through */
             digit_check = false;
         }
         i++;
