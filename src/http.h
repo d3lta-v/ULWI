@@ -25,10 +25,10 @@ enum request_progress
 struct http_request
 {
     char method;                        /* HTTP method of the request, G for GET, P for POST and so on */
-    char url[HTTP_TX_CONTENT_MAX];      /* Full URL of the request */
-    char params[HTTP_TX_CONTENT_MAX];   /* Parameters of the request, usually part of the URL */
-    char content[HTTP_TX_CONTENT_MAX];  /* Content of the request */
-    char headers[HTTP_TX_CONTENT_MAX];  /* HTTP headers of the request */
+    struct mg_str url;
+    struct mg_str params;   /* Parameters of the request, usually part of the URL */
+    struct mg_str content;  /* Content of the request */
+    struct mg_str headers;  /* HTTP headers of the request */
 };
 
 struct http_response

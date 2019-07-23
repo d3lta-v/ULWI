@@ -294,7 +294,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                             request->method = token[0];
                             break;
                         case 1:
-                            strcpy(request->url, token);
+                            request->url = mg_strdup_nul(mg_mk_str(token));
                             break;
                         }
                         token = strtok(NULL, ULWI_DELIMITER);
@@ -306,7 +306,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         /* Ensure that the relevant http_response struct is empty before finishing */
                         ulwi_empty_response(response);
                         mgos_uart_printf(UART_NO, "%i\r\n", handle);
-                        LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url));
+                        LOG(LL_INFO, ("request type: %c, url: %s", request->method, request->url.p));
                     }
                     else
                     {
@@ -367,8 +367,8 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         /* Clear the previous response */
                         ulwi_empty_response(response);
-                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url, request->params, request->content, request->headers));
-                        mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url, NULL, NULL);
+                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url.p, request->params.p, request->content.p, request->headers.p));
+                        mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, NULL, NULL);
                     }
                     else
                     {

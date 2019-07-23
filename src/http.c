@@ -132,10 +132,10 @@ void ulwi_empty_response(struct http_response *s)
 void ulwi_empty_request(struct http_request *r)
 {
     r->method = '\0';
-    r->url[0] = '\0';
-    r->params[0] = '\0';
-    r->content[0] = '\0';
-    r->headers[0] = '\0';
+    mg_strfree(&r->url);
+    mg_strfree(&r->params);
+    mg_strfree(&r->content);
+    mg_strfree(&r->headers);
 }
 
 /******************************************************************************
@@ -238,16 +238,16 @@ void insert_field_http_request(enum http_data type, struct mg_str *line, struct 
                     {
                     case PARAMETER:
                         LOG(LL_INFO, ("params: %s", token));
-                        strcpy(http_array[handle].params, token);
+                        http_array[handle].params = mg_strdup_nul(mg_mk_str(token));
                         break;
                     case CONTENT:
                         LOG(LL_INFO, ("content: %s", token));
-                        strcpy(http_array[handle].content, token);
+                        http_array[handle].content = mg_strdup_nul(mg_mk_str(token));
                         break;
                     case HEADER: {
                         char *buffer = repl_str(token, "\n", "\r\n");
                         LOG(LL_INFO, ("headers: %s", buffer));
-                        strcpy(http_array[handle].headers, buffer);
+                        http_array[handle].headers = mg_strdup_nul(mg_mk_str(buffer));
                         free(buffer);
                         break;
                     }
