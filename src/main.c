@@ -367,7 +367,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         /* Clear the previous response */
                         ulwi_empty_response(response);
-                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s, params: %s, content: %s, headers: %s", request->method, request->url.p, request->params.p, request->content.p, request->headers.p));
+                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s", request->method, request->url.p));
                         mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, NULL, NULL);
                     }
                     else
