@@ -113,5 +113,12 @@ void wifi_scan_cb(int n, struct mgos_wifi_scan_result *res, void *arg)
         mgos_uart_printf(UART_NO, "%s", res[i].ssid);
     }
     mgos_uart_printf(UART_NO, "\r\n");
+    /* Turn off AP mode radio once complete with scan */
+    /* TODO: if AP mode is implemented in the future, do not turn off AP mode */
+    const struct mgos_config_wifi_ap ap_config = 
+    { 
+        .enable = false
+    };
+    mgos_wifi_setup_ap(&ap_config);
     (void)arg;
 }

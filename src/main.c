@@ -139,22 +139,44 @@ static void uart_dispatcher(int uart_no, void *arg)
         /* Phase II: string comparison to sort out the commands */
         if (mg_str_starts_with(line, COMMAND_NOP) && line.len == 3)
         {
+            /* No Operation */
             mgos_uart_printf(UART_NO, "\r\n");
         }
         else if (mg_str_starts_with(line, COMMAND_VER) && line.len == 3)
         {
+            /* Print Version */
             mgos_uart_printf(UART_NO, "v1.0-alpha1\r\n");
         }
         else if (mg_str_starts_with(line, COMMAND_RST) && line.len == 3)
         {
+            /* Reset device */
             mgos_system_restart();
         }
         else if (mg_str_starts_with(line, COMMAND_LAP) && line.len == 3)
         {
+            /* List Access Points */
+            /* We need to ensure that Wi-Fi radio is enabled, even temporarily,
+               for this purpose */
+            float rand = mgos_rand_range(0.0f, 100.0f);
+            char buf[10];
+            snprintf(buf, 10, "%f", rand);
+            const struct mgos_config_wifi_ap ap_config = 
+            { 
+                .enable = true,
+                .ssid = buf,
+                .dhcp_start = "10.1.0.2",
+                .dhcp_end = "10.1.0.9",
+                .ip = "10.1.0.1",
+                .netmask = "255.255.255.0",
+                .gw = "10.1.0.1",
+                .hidden = true
+            };
+            mgos_wifi_setup_ap(&ap_config);
             mgos_wifi_scan(wifi_scan_cb, NULL);
         }
         else if (mg_str_starts_with(line, COMMAND_CAP))
         {
+            /* Connect to Access Point */
             const size_t min_len = 4;               /* 3 for command, 1 space */
             const size_t max_len = min_len + 255;
             const enum str_len_state str_state = ulwi_validate_strlen(line.len, min_len, max_len);
@@ -210,6 +232,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         }
         else if (mg_str_starts_with(line, COMMAND_SAP) && line.len == 3)
         {
+            /* Status of Access Point */
             const enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
             const char *ssid = mgos_wifi_get_connected_ssid();
             switch (wifi_status)
@@ -244,6 +267,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         }
         else if (mg_str_starts_with(line, COMMAND_DAP) && line.len == 3)
         {
+            /* Disconnect from Access Point */
             const char *ssid = mgos_wifi_get_connected_ssid();
             if (ssid)
             {
@@ -258,7 +282,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         }
         else if (mg_str_starts_with(line, COMMAND_GIP) && line.len == 3)
         {
-            // get IP
+            /* Get IP */
             struct mgos_net_ip_info ip_information;
             mgos_net_get_ip_info(MGOS_NET_IF_TYPE_WIFI, MGOS_NET_IF_WIFI_STA, &ip_information);
             char ip[16];
