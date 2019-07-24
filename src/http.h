@@ -8,8 +8,8 @@
 
 enum http_data
 {
-    PARAMETER,  /* Specifies parameters for a HTTP request. Only applicable for the PHR command */
-    CONTENT,    /* Specifies or retrieves content for HTTP data */
+    POST_FIELD, /* Specifies parameters for a HTTP request. Only applicable for the PHR command */
+    CONTENT,    /* Retrieves content for HTTP data */
     HEADER,     /* Specifies or retrieves headers for HTTP data */
     STATE       /* Retrieves the current state of the HTTP data. Only applicable for the GHR command */
 };
@@ -26,9 +26,8 @@ struct http_request
 {
     char method;                        /* HTTP method of the request, G for GET, P for POST and so on */
     struct mg_str url;
-    struct mg_str params;   /* Parameters of the request, usually part of the URL */
-    struct mg_str content;  /* Content of the request */
-    struct mg_str headers;  /* HTTP headers of the request */
+    struct mg_str post_field;   /* Parameters of the request, usually part of the URL */
+    struct mg_str headers;      /* HTTP headers of the request */
 };
 
 struct http_response

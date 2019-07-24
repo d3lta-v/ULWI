@@ -359,12 +359,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_PHR) && line.len > 4)
         {
             /* Parameter of HTTP request */
-            insert_field_http_request(PARAMETER, &line, http_array);
-        }
-        else if (mg_str_starts_with(line, COMMAND_CHR) && line.len > 4)
-        {
-            /* Content of HTTP request */
-            insert_field_http_request(CONTENT, &line, http_array);
+            insert_field_http_request(POST_FIELD, &line, http_array);
         }
         else if (mg_str_starts_with(line, COMMAND_HHR) && line.len > 4)
         {
@@ -391,8 +386,32 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         /* Clear the previous response */
                         ulwi_empty_response(response);
-                        LOG(LL_INFO, ("Sending HTTP request with method: %c, url: %s", request->method, request->url.p));
-                        mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, NULL, NULL);
+                        char *headers = NULL;
+                        if (request->headers.len > 0)
+                        {
+                            headers = (char *)request->headers.p;
+                        }
+                        if (request->method == 'G')
+                        {
+                            LOG(LL_INFO, ("GET HTTP url: %s", request->url.p));
+                            mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, NULL);
+                        }
+                        else if (request->method == 'P')
+                        {
+                            if (request->post_field.len > 0)
+                            {
+                                LOG(LL_INFO, ("POST HTTP url: %s, data: %s", request->url.p, request->post_field.p));
+                                mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, request->post_field.p);
+                            }
+                            else
+                            {
+                                /* TODO: Check if the behavior of this condition actually even performs POST, since an empty string
+                                   is effectively \0 (which, while different from a NULL, which is a pointer, may be the same
+                                   thing depending on the system) */
+                                LOG(LL_INFO, ("POST HTTP url: %s", request->url.p));
+                                mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, "");
+                            }
+                        }
                     }
                     else
                     {
