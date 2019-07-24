@@ -139,18 +139,6 @@ HTTP method types:
 
 **Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist, or that the HTTP handle is a GET request and does not support this field.
 
-### Content of HTTP Request
-
-**Command**: `chr <http request handle>|<content>`  
-**Type**: Action  
-**Purpose**: Specifies the contents field of a HTTP request before sending the request. This is done separately from `ihr`.
-**Parameters**:
-
-- `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
-- `<content>`: The content of the HTTP request.
-
-**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
-
 ### Headers of HTTP Request
 
 **Command**: `hhr <http request handle>|<headers>`  
