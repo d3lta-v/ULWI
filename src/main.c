@@ -518,7 +518,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         {
                         case STATE:
                             /* Get http_response */
-                            mgos_uart_printf(UART_NO, "%c\r\n", (char)http_response->progress);
+                            mgos_uart_printf(UART_NO, "%i\r\n", http_response->status);
                             break;
                         case HEADER:
                             /* Get headers of the HTTP response */
