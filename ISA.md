@@ -127,17 +127,17 @@ HTTP method types:
 
 **Returns**: A unique identifier or handle that identifies the HTTP request, or `U` if it failed to create the handle
 
-### Parameters of HTTP Request
+### POST parameters of HTTP Request
 
 **Command**: `phr <http request handle>|<parameters>`  
 **Type**: Action  
-**Purpose**: Specifies the parameters field of a HTTP request before sending the request. This is done separately from `ihr`.  
+**Purpose**: Specifies the POST body of a HTTP request before sending the request. This is done separately from `ihr`.  
 **Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
-- `<parameters>`: The parameters of the HTTP request. Example: `var_1=value1&var_1=value2`, which is typically behind the URL.
+- `<parameters>`: The POST data of the HTTP request. Example: `var_1=value1&var_1=value2`, which is typically behind the URL. Keep in mind that if you are POSTing form-encoded data (similar to the example above) that you have to specify a header with the value "Content-Type: application/x-www-form-urlencoded\n" by using the `hhr` command.
 
-**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
+**Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist, or that the HTTP handle is a GET request and does not support this field.
 
 ### Content of HTTP Request
 
@@ -159,7 +159,7 @@ HTTP method types:
 **Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
-- `<headers>`: The headers of the HTTP request. Example: `Header1: value1\nHeader2: value2`. This method ONLY accepts UNIX style line endings to separate headers (e.g. LF) and not Windows style line endings actually used by web servers (e.g. CRLF) to prevent the entry from messing with
+- `<headers>`: The headers of the HTTP request. Example: `Header1: value1\nHeader2: value2\n`. This method ONLY accepts UNIX style line endings to separate headers (e.g. LF) and not Windows style line endings actually used by web servers (e.g. CRLF) to prevent the data from interfering with the command.
 
 **Returns**: `<S/U>` Successful or Unsuccessful. Returns `U` if that HTTP request handle does not exist.
 
