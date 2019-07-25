@@ -186,18 +186,30 @@ static void uart_dispatcher(int uart_no, void *arg)
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
 
                 const int max_params = 5;
-                const int max_param_count = 65;
-                char result[max_params][max_param_count];
+                const int max_param_len = 65;
+                char result[max_params][max_param_len];
 
-                const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_count, result);
+                const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
                 
                 if (param_len == 2)
                 {
                     const struct mgos_config_wifi_sta wifi_config = 
                     { 
                         .enable = true, 
-                        .ssid = result[0], 
+                        .ssid = result[0],
                         .pass = result[1]
+                    };
+                    mgos_wifi_setup_sta(&wifi_config);
+                    mgos_uart_printf(UART_NO, "\r\n");
+                }
+                else if (param_len == 3)
+                {
+                    const struct mgos_config_wifi_sta wifi_config = 
+                    { 
+                        .enable = true, 
+                        .ssid = result[0],
+                        .user = result[1],
+                        .pass = result[2]
                     };
                     mgos_wifi_setup_sta(&wifi_config);
                     mgos_uart_printf(UART_NO, "\r\n");

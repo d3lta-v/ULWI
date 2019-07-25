@@ -71,13 +71,14 @@ HTTP method types:
 
 ### Connect to Access Point
 
-**Command**: `cap <ssid>|<password>(|<ip>|<gw>|<netmask>)`  
+**Command**: `cap <ssid>|<password>`, `cap <ssid>|<password>(|<ip>|<gw>|<netmask>)` or `cap <ssid>|<username>|<password>`  
 **Type**: Action  
-**Purpose**: Connects to an access point with SSID and password. Optionally, one can pass in the IP, gateway and netmask if the access point uses static IP allocation. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
+**Purpose**: Connects to an access point. If there are only 2 arguments, the OS will assume authentication to a WPA/WPA2-PSK network. If there are 5 arguments, the OS WILL assume authentication to a WPA/WPA2-PSK network with static IP. If there are 3 arguments, the OS will assume authentication to a WPA2-Enterprise network with PEAP authentication. This method does not pass back a connection success or failed message. To query if the connection was successful, use `sap` instead.  
 **Parameters**:
 
 - `<ssid>`: The SSID of the Wi-Fi access point to connect to
-- `<password>`: The PSK of the Wi-Fi access point to connect to
+- `<username>` (optional): The username of the user for authenticating to enterprise networks
+- `<password>`: The password of the Wi-Fi access point to connect to
 - `<ip>` (optional): The desired IP address of the current device
 - `<gw>` (optional): The gateway IP of the network
 - `<netmask>` (optional): The net mask of the network
