@@ -209,6 +209,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         .enable = true, 
                         .ssid = result[0],
                         .user = result[1],
+                        .anon_identity = result[1],
                         .pass = result[2]
                     };
                     mgos_wifi_setup_sta(&wifi_config);
@@ -246,7 +247,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             /* Status of Access Point */
             const enum mgos_wifi_status wifi_status = mgos_wifi_get_status();
-            const char *ssid = mgos_wifi_get_connected_ssid();
+            char *ssid = mgos_wifi_get_connected_ssid();
             switch (wifi_status)
             {
             case MGOS_WIFI_DISCONNECTED:
@@ -276,6 +277,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "U\r\n");
                 break;
             }
+            free(ssid);
         }
         else if (mg_str_starts_with(line, COMMAND_DAP) && line.len == 3)
         {
