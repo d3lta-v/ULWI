@@ -24,6 +24,7 @@ filesystem:
 
 config_schema:
   - ["wifi.ap.enable", false]
+  - ["wifi.ap.keep_enabled", false]
 #  - ["my_app", "o", {title: "My app custom settings"}]
 #  - ["my_app.bool_value", "b", false, {title: "Some boolean value"}]
 #  - ["my_app.string_value", "s", "", {title: "Some string value"}]

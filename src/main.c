@@ -209,7 +209,6 @@ static void uart_dispatcher(int uart_no, void *arg)
                         .enable = true, 
                         .ssid = result[0],
                         .user = result[1],
-                        .anon_identity = result[1],
                         .pass = result[2]
                     };
                     mgos_wifi_setup_sta(&wifi_config);
@@ -650,7 +649,7 @@ enum mgos_app_init_result mgos_app_init(void)
     /* Enable or disable logging based on the build environment */
 #ifdef DEVELOPMENT
     mgos_set_timer(10000, MGOS_TIMER_REPEAT, timer_cb, NULL); /* Enable debug timer */
-    cs_log_set_level(LL_DEBUG); /* Enable logging, but not too verbose */
+    cs_log_set_level(LL_VERBOSE_DEBUG); /* Full verbose logging */
 #else
     mgos_set_stdout_uart(-1);  /* Disables stdout */
     mgos_set_stderr_uart(-1);  /* Disables stderr */
