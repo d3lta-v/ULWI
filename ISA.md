@@ -209,3 +209,77 @@ HTTP method types:
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
 **Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
+
+## MQTT Operations
+
+### MQTT Configure
+
+**Command**: `mcg <T/F>|<server:port>|<T/F>(|<username>|<password>)`  
+**Type**: Reply  
+**Purpose**: Configures MQTT client with parameters    
+**Parameters**:
+
+- `<T/F>`: Boolean which enables or disables the MQTT client
+- `<server:port>`: Server and port of the MQTT broker/server
+- `<T/F>`: Boolean which enables or disables TLS. By default, ULWI uses a predefined list of certificates from major certficate authorities to verify the authenticity of the site. If one wishes to alter the encryption settings, refer to the injection commands below
+- `<username>` (Optional): Username for authenticating to the MQTT server
+- `<password>` (Optional): Password for authenticating to the MQTT server
+
+**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
+
+### MQTT Inject Certificate Authority Certificate
+
+**Command**: `mca <certificate>`  
+WIP. This feature is mainly meant for higher level X.509 based authentication such as with AWS IoT.
+
+### MQTT Inject Client Certificate
+
+**Command**: `mcc <certificate>`  
+WIP. This feature is mainly meant for higher level X.509 based authentication such as with AWS IoT.
+
+### MQTT Inject Private Key
+
+**Command**: `mpk <key>`  
+WIP. This feature is mainly meant for higher level X.509 based authentication such as with AWS IoT.
+
+### MQTT Subscribe
+
+**Command**: `msb <topic>`  
+**Type**: Action  
+**Purpose**: Subscribes to an MQTT topic  
+**Parameters**: 
+
+- `<topic>`: The MQTT topic to subscribe to
+
+**Returns**: `\r\n` (Windows style newline)
+
+### MQTT Check for New Data Arrival
+
+**Command**: `mnd`  
+**Type**: Reply  
+**Purpose**: Checks if a new piece of data has just arrived from a subcription  
+**Parameters**: None  
+**Returns**: `<T/F>\r\n` boolean value depending on whether new data has arrived. True values will turn to False after `mgs` has been run to mark the data as stale.
+
+
+### MQTT Get Subscribed Data
+
+**Command**: `mgs`  
+**Type**: Reply  
+**Purpose**: Retrieves the latest data. This resets the `mnd` command's reply from true to false.  
+**Parameters**: None  
+**Returns**: The raw data which was retrieved after subscription
+
+### MQTT Publish
+
+**Command**: `mpb <topic>|<content>|<qos>|<T/F>`  
+**Type**: Reply  
+**Purpose**: Publishes to MQTT broker  
+**Parameters**:
+
+- `<topic>`: The MQTT topic to publish to
+- `<content>`: The content of the MQTT message
+- `<qos>`: Quality of Service level, either 0 (no guarantee of delivery) or 1 (guaranteed delivery)
+- `<T/F>`: Boolean that sets the retain flag on the MQTT message. Retained messages allows new MQTT subscribers to 
+
+**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when the MQTT client is not active)
