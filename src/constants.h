@@ -51,4 +51,12 @@ static const struct mg_str COMMAND_SHR = MG_MK_STR("shr");
 static const struct mg_str COMMAND_GHR = MG_MK_STR("ghr");
 static const struct mg_str COMMAND_DHR = MG_MK_STR("dhr");
 
+/* MQTT commands */
+static const struct mg_str COMMAND_MCG = MG_MK_STR("mcg");
+static const struct mg_str COMMAND_MIC = MG_MK_STR("mic");
+static const struct mg_str COMMAND_MSB = MG_MK_STR("msb");
+static const struct mg_str COMMAND_MND = MG_MK_STR("mnd");
+static const struct mg_str COMMAND_MGS = MG_MK_STR("mgs");
+static const struct mg_str COMMAND_MPB = MG_MK_STR("mpb");
+
 #endif
