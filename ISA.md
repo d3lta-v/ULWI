@@ -221,11 +221,19 @@ HTTP method types:
 
 - `<T/F>`: Boolean which enables or disables the MQTT client
 - `<server:port>`: Server and port of the MQTT broker/server
-- `<T/F>`: Boolean which enables or disables TLS. By default, ULWI uses a predefined list of certificates from major certficate authorities to verify the authenticity of the site. If one wishes to alter the encryption settings, refer to the injection commands below
+- `<T/F>`: Boolean which enables or disables TLS. By default, ULWI uses a predefined list of certificates from major certficate authorities to verify the authenticity of0 the site. If one wishes to alter the encryption settings, refer to the injection commands below
 - `<username>` (Optional): Username for authenticating to the MQTT server
 - `<password>` (Optional): Password for authenticating to the MQTT server
 
 **Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
+
+### MQTT Is Connected
+
+**Command**: `mic`  
+**Type**: Reply  
+**Purpose**: Checks if the MQTT client is connected.  
+**Parameters**: None  
+**Returns**: `T` or `F` depending on if the MQTT client is connected.
 
 ### MQTT Inject Certificate Authority Certificate
 
