@@ -39,6 +39,7 @@
 #include "common.h"
 #include "wifi.h"
 #include "http.h"
+#include "mqtt.h"
 
 /* TODO: Comment out the definition if in production!! */
 #define DEVELOPMENT
@@ -59,13 +60,13 @@ static struct http_response response_array[HTTP_HANDLES_MAX];
  * RETURNS: none                                                              *
  *                                                                            *
  *****************************************************************************/
-static void timer_cb(void *arg) {
-    LOG(LL_INFO,
-        ("uptime: %.2lf, RAM: %lu, %lu free",
-        mgos_uptime(), (unsigned long) mgos_get_heap_size(),
-        (unsigned long) mgos_get_free_heap_size()));
-    (void) arg;
-}
+// static void timer_cb(void *arg) {
+//     LOG(LL_INFO,
+//         ("uptime: %.2lf, RAM: %lu, %lu free",
+//         mgos_uptime(), (unsigned long) mgos_get_heap_size(),
+//         (unsigned long) mgos_get_free_heap_size()));
+//     (void) arg;
+// }
 #endif /* DEVELOPMENT */
 
 /******************************************************************************
@@ -634,6 +635,150 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_MCG))
+        {
+            /* MQTT Configure */
+            // 5 arguments max, 3 arguments standard
+
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 320);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[320] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+
+                const int max_params = 5;
+                const int max_param_len = 65;
+                char result[max_params][max_param_len];
+
+                const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
+                
+                struct mgos_config_mqtt mqtt_conf = *mgos_sys_config_get_mqtt();
+
+                if (param_len == 1)
+                {
+                    /* Enable or disable only */
+                    bool enable = result[0][0] == 'T'; //TODO: does this need additional sanitisation?
+                    if (!enable)
+                    {
+                        /* Allow disable under any circumstances */
+                        mqtt_conf.enable = enable;
+                        mgos_mqtt_set_config(&mqtt_conf);
+                    }
+                    else if (mqtt_conf.server != NULL)
+                    {
+                        /* Enable is true in this if statement, only allow enable if server field is not empty */
+                        mqtt_conf.enable = enable;
+                        mgos_mqtt_set_config(&mqtt_conf);
+                    }
+                    else
+                    {
+                        /* Cannot enable if server field is empty */
+                        mgos_uart_printf(UART_NO, "U\r\n");
+                    }
+                }
+                else if (param_len == 3)
+                {
+                    //TODO: add input sanitisation in here
+                    const bool enable_tls = result[2][0] == 'T' ? true : false;
+                    mqtt_conf.enable = result[0][0] == 'T' ? true : false;
+                    mqtt_conf.server = result[1];
+                    mqtt_conf.ssl_ca_cert = enable_tls ? "rootca.pem" : NULL;
+                    mgos_mqtt_set_config(&mqtt_conf);
+                    mgos_uart_printf(UART_NO, "\r\n");
+                }
+                else if (param_len == 5)
+                {
+                    const bool enable_tls = result[2][0] == 'T' ? true : false;
+                    mqtt_conf.enable = result[0][0] == 'T' ? true : false;
+                    mqtt_conf.server = result[1];
+                    mqtt_conf.user = result[3];
+                    mqtt_conf.pass = result[4];
+                    mqtt_conf.ssl_ca_cert = enable_tls ? "rootca.pem" : NULL;
+                    
+                    if (mgos_mqtt_set_config(&mqtt_conf))
+                    {
+                        if (mgos_mqtt_global_connect())
+                        {
+                            mgos_uart_printf(UART_NO, "\r\n");
+                        }
+                        else
+                        {
+                            mgos_uart_printf(UART_NO, "U\r\n");
+                        }
+                    }
+                    else
+                    {
+                        mgos_uart_printf(UART_NO, "U\r\n");
+                    }
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "invalid\r\n");
+                }
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_MIC) && line.len == 3)
+        {
+            /* MQTT Is Connected? */
+            if (mgos_mqtt_global_is_connected())
+            {
+                //TODO WARNING: this function returns true even setting MQTT enable to false. will need to investigate further
+                mgos_uart_printf(UART_NO, "T\r\n");
+            }
+            else
+            {
+                mgos_uart_printf(UART_NO, "F\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_MPB))
+        {
+            /* MQTT Publish */
+            // 4 arguments
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 255);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[256] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+
+                const int max_params = 4;
+                const int max_param_len = 64;
+                char result[max_params][max_param_len];
+
+                const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
+                if (param_len == 4)
+                {
+                    // mgos_mqtt_pub("d3lta_v/feeds/example", "10", 1, 0, false)
+                    if (mgos_mqtt_pub(result[0], result[1], strlen(result[1]), 0, false))
+                    {
+                        mgos_uart_printf(UART_NO, "\r\n");
+                    }
+                    else
+                    {
+                        mgos_uart_printf(UART_NO, "U\r\n");
+                    }
+                }
+                else
+                {
+                    mgos_uart_printf(UART_NO, "invalid\r\n");
+                }
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
         else
         {
             mgos_uart_printf(UART_NO, "invalid\r\n");
@@ -648,7 +793,7 @@ enum mgos_app_init_result mgos_app_init(void)
 {
     /* Enable or disable logging based on the build environment */
 #ifdef DEVELOPMENT
-    mgos_set_timer(10000, MGOS_TIMER_REPEAT, timer_cb, NULL); /* Enable debug timer */
+    // mgos_set_timer(10000, MGOS_TIMER_REPEAT, timer_cb, NULL); /* Enable debug timer */
     cs_log_set_level(LL_VERBOSE_DEBUG); /* Full verbose logging */
 #else
     mgos_set_stdout_uart(-1);  /* Disables stdout */
@@ -679,6 +824,9 @@ enum mgos_app_init_result mgos_app_init(void)
 
     /* Setup Wi-Fi event handlers */
     mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, wifi_cb, NULL);
+
+    /* Setup MQTT handlers */
+    mgos_mqtt_add_global_handler(mqtt_ev_handler, NULL);
 
     return MGOS_APP_INIT_SUCCESS;
 }
