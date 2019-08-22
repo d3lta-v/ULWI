@@ -738,6 +738,27 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "F\r\n");
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_MSB))
+        {
+            /* MQTT Subscribe */
+            // 1 argument
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 255);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[256] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+                mgos_mqtt_sub(parameter_c_str, mqtt_sub_handler, NULL);
+                mgos_uart_printf(UART_NO, "\r\n");
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
         else if (mg_str_starts_with(line, COMMAND_MPB))
         {
             /* MQTT Publish */
