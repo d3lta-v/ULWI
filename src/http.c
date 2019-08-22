@@ -1,6 +1,5 @@
 #include "http.h"
 #include "common.h"
-#include "mgos_rpc.h"
 #include "constants.h"
 
 /******************************************************************************
