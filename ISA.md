@@ -261,22 +261,38 @@ WIP. This feature is mainly meant for higher level X.509 based authentication su
 
 **Returns**: `\r\n` (Windows style newline)
 
+### MQTT Un-Subscribe
+
+**Command**: `mus <topic>`  
+**Type**: Action  
+**Purpose**: Unsubscribes from an MQTT topic  
+**Parameters**:
+
+- `<topic>`: The MQTT topic to unsubscribe from
+
+**Returns**: `S` if the command was successful, `U` if the command failed (such as when the MQTT client is not connected)
+
 ### MQTT Check for New Data Arrival
 
-**Command**: `mnd`  
+**Command**: `mnd <topic>`  
 **Type**: Reply  
 **Purpose**: Checks if a new piece of data has just arrived from a subcription  
-**Parameters**: None  
-**Returns**: `<T/F>\r\n` boolean value depending on whether new data has arrived. True values will turn to False after `mgs` has been run to mark the data as stale.
+**Parameters**:
 
+- `<topic>`: The MQTT topic that you previously subscribed to
+
+**Returns**: `<T/F>\r\n` boolean value depending on whether new data has arrived. True values will turn to False after `mgs` has been run to mark the data as stale.
 
 ### MQTT Get Subscribed Data
 
-**Command**: `mgs`  
+**Command**: `mgs <topic>`  
 **Type**: Reply  
 **Purpose**: Retrieves the latest data. This resets the `mnd` command's reply from true to false.  
-**Parameters**: None  
-**Returns**: The raw data which was retrieved after subscription
+**Parameters**:
+
+- `<topic>`: The MQTT topic that you previously subscribed to
+
+**Returns**: The raw data which was retrieved after subscription followed by a Windows style new line (`\r\n`)
 
 ### MQTT Publish
 
@@ -290,4 +306,4 @@ WIP. This feature is mainly meant for higher level X.509 based authentication su
 - `<qos>`: Quality of Service level, either 0 (no guarantee of delivery) or 1 (guaranteed delivery)
 - `<T/F>`: Boolean that sets the retain flag on the MQTT message. Retained messages allows new MQTT subscribers to 
 
-**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when the MQTT client is not active)
+**Returns**: `S` if command was executed successfully, `U` if the command failed (such as when the MQTT client is not active)
