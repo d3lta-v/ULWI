@@ -259,7 +259,7 @@ WIP. This feature is mainly meant for higher level X.509 based authentication su
 
 - `<topic>`: The MQTT topic to subscribe to
 
-**Returns**: `\r\n` (Windows style newline)
+**Returns**: `S` if the command was successful, `U` if the command failed (such as when the MQTT client is not connected)
 
 ### MQTT Un-Subscribe
 

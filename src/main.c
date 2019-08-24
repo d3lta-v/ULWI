@@ -662,13 +662,16 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         /* Allow disable under any circumstances */
                         mqtt_conf.enable = enable;
+                        ulwi_mqtt_unsub_all();
                         mgos_mqtt_set_config(&mqtt_conf);
+                        mgos_uart_printf(UART_NO, "\r\n");
                     }
                     else if (mqtt_conf.server != NULL)
                     {
                         /* Enable is true in this if statement, only allow enable if server field is not empty */
                         mqtt_conf.enable = enable;
                         mgos_mqtt_set_config(&mqtt_conf);
+                        mgos_uart_printf(UART_NO, "\r\n");
                     }
                     else
                     {
@@ -742,13 +745,42 @@ static void uart_dispatcher(int uart_no, void *arg)
         {
             /* MQTT Subscribe */
             // 1 argument
-            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 255);
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 127);
             if (str_state == STRING_OK)
             {
-                char parameter_c_str[256] = {0};
+                char parameter_c_str[128] = {0};
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
-                mgos_mqtt_sub(parameter_c_str, mqtt_sub_handler, NULL);
-                mgos_uart_printf(UART_NO, "\r\n");
+                if (!ulwi_mqtt_sub_exists(parameter_c_str))
+                {
+                    ulwi_mqtt_sub(parameter_c_str, mqtt_sub_handler, NULL);
+                    mgos_uart_printf(UART_NO, "S\r\n");
+                }
+                else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription already exists */
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_MUS))
+        {
+            /* MQTT Unsubscribe */
+            // 1 argument
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 127);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[128] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+                if (ulwi_mqtt_sub_exists(parameter_c_str))
+                {
+                    ulwi_mqtt_unsub(parameter_c_str);
+                    mgos_uart_printf(UART_NO, "S\r\n");
+                }
+                else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
             }
             else if (str_state == STRING_LONG)
             {
@@ -776,10 +808,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                 const int param_len = split_parameter_string(parameter_c_str, max_params, max_param_len, result);
                 if (param_len == 4)
                 {
-                    // mgos_mqtt_pub("d3lta_v/feeds/example", "10", 1, 0, false)
                     if (mgos_mqtt_pub(result[0], result[1], strlen(result[1]), 0, false))
                     {
-                        mgos_uart_printf(UART_NO, "\r\n");
+                        mgos_uart_printf(UART_NO, "S\r\n");
                     }
                     else
                     {
