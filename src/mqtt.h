@@ -19,12 +19,15 @@ struct mqtt_subscription
     UT_hash_handle hh;
 };
 
+bool ulwi_mqtt_sub_exists(const char *topic);
+
 void mqtt_ev_handler(struct mg_connection *c, int ev, void *p, void *user_data);
 void mqtt_sub_handler(struct mg_connection *nc, const char *topic, int topic_len, const char *msg, int msg_len, void *ud);
 
 void ulwi_mqtt_sub(const char *topic, sub_handler_t handler, void *user_data);
 bool ulwi_mqtt_unsub(char *topic);
 void ulwi_mqtt_unsub_all();
-bool ulwi_mqtt_sub_exists(const char *topic);
+bool ulwi_mqtt_new_data_arrived(const char *topic);
+struct mg_str *ulwi_mqtt_get_sub_message(const char *topic);
 
 #endif

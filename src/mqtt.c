@@ -2,6 +2,21 @@
 
 struct mqtt_subscription *ulwi_mqtt_subscriptions = NULL;
 
+struct mqtt_subscription *ulwi_mqtt_get_sub(const char *topic)
+{
+    struct mqtt_subscription *s;
+    HASH_FIND_STR(ulwi_mqtt_subscriptions, topic, s);
+    return s;
+}
+
+bool ulwi_mqtt_sub_exists(const char *topic)
+{
+    struct mqtt_subscription *s;
+    HASH_FIND_STR(ulwi_mqtt_subscriptions, topic, s);
+    if (s != NULL) return true;
+    else return false;
+}
+
 void mqtt_ev_handler(struct mg_connection *c, int ev, void *p, void *user_data) {
     struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
 
@@ -21,38 +36,30 @@ void mqtt_ev_handler(struct mg_connection *c, int ev, void *p, void *user_data) 
 
 void mqtt_sub_handler(struct mg_connection *nc, const char *topic, int topic_len, const char *msg, int msg_len, void *ud)
 {
+    /* Free previous string and reset new counter */
     struct mg_str topic_str = mg_strdup_nul(mg_mk_str_n(topic, topic_len));
-    struct mg_str msg_str = mg_strdup_nul(mg_mk_str_n(msg, msg_len));
-    LOG(LL_INFO, ("Topic: %s", topic_str.p));
-    /* Find the topic string as key in the hash table */
-    LOG(LL_INFO, ("Message: %s", msg_str.p));
+    struct mqtt_subscription *sub = ulwi_mqtt_get_sub(topic_str.p);
+    if (sub == NULL)
+    {
+        /* NULL pointer checking, clean up heap allocated stuff */
+        LOG(LL_ERROR, ("MQTT Topic %s is not found in hash table!!", topic_str.p));
+        mg_strfree(&topic_str);
+        return;
+    }
+
+    mg_strfree(&sub->message);
+    sub->new = true;
+    sub->active = true;
+    sub->message = mg_strdup_nul(mg_mk_str_n(msg, msg_len));
     mg_strfree(&topic_str);
-    mg_strfree(&msg_str);
     (void) nc;
     (void) ud;
-    (void) topic_len;
-    (void) msg_len;
 }
 
 struct sub_data {
     sub_handler_t handler;
     void *user_data;
 };
-
-struct mqtt_subscription *ulwi_mqtt_get_sub(const char *topic)
-{
-    struct mqtt_subscription *s;
-    HASH_FIND_STR(ulwi_mqtt_subscriptions, topic, s);
-    return s;
-}
-
-bool ulwi_mqtt_sub_exists(const char *topic)
-{
-    struct mqtt_subscription *s;
-    HASH_FIND_STR(ulwi_mqtt_subscriptions, topic, s);
-    if (s != NULL) return true;
-    else return false;
-}
 
 static void mqttsubtrampoline(struct mg_connection *c, int ev, void *ev_data, void *user_data) {
     if (ev != MG_EV_MQTT_PUBLISH) return;
@@ -113,4 +120,19 @@ void ulwi_mqtt_unsub_all()
 
         mg_mqtt_unsubscribe(nc, &topic_ptr, 1, mgos_mqtt_get_packet_id());
     }
+}
+
+bool ulwi_mqtt_new_data_arrived(const char *topic)
+{
+    struct mqtt_subscription *sub = ulwi_mqtt_get_sub(topic);
+    if (sub == NULL) return false;
+    return sub->new;
+}
+
+struct mg_str *ulwi_mqtt_get_sub_message(const char *topic)
+{
+    struct mqtt_subscription *sub = ulwi_mqtt_get_sub(topic);
+    if (sub == NULL) return NULL;
+    sub->new = false;
+    return &sub->message;
 }

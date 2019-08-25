@@ -791,6 +791,56 @@ static void uart_dispatcher(int uart_no, void *arg)
                 mgos_uart_printf(UART_NO, "short\r\n");
             }
         }
+        else if (mg_str_starts_with(line, COMMAND_MND))
+        {
+            /* MQTT check subscription for New Data */
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 127);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[128] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+                if (ulwi_mqtt_sub_exists(parameter_c_str))
+                {
+                    ulwi_mqtt_new_data_arrived(parameter_c_str) ? mgos_uart_printf(UART_NO, "T\r\n") : mgos_uart_printf(UART_NO, "F\r\n");
+                }
+                else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
+        else if (mg_str_starts_with(line, COMMAND_MGS))
+        {
+            /* MQTT Get Subscribed message */
+            const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5 + 127);
+            if (str_state == STRING_OK)
+            {
+                char parameter_c_str[128] = {0};
+                ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
+                struct mg_str *message = ulwi_mqtt_get_sub_message(parameter_c_str);
+                if (message != NULL)
+                {
+                    struct mg_str buffer = mg_strdup_nul(*message);
+                    mgos_uart_write(UART_NO, buffer.p, buffer.len);
+                    mgos_uart_printf(UART_NO, "\r\n");
+                    mg_strfree(&buffer);
+                }
+                else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
+            }
+            else if (str_state == STRING_LONG)
+            {
+                mgos_uart_printf(UART_NO, "long\r\n");
+            }
+            else if (str_state == STRING_SHORT)
+            {
+                mgos_uart_printf(UART_NO, "short\r\n");
+            }
+        }
         else if (mg_str_starts_with(line, COMMAND_MPB))
         {
             /* MQTT Publish */
