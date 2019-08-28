@@ -263,7 +263,7 @@ static void uart_dispatcher(int uart_no, void *arg)
             case MGOS_WIFI_IP_ACQUIRED:
                 if (ssid)
                 {
-                    mgos_uart_printf(UART_NO, "S\x1f%s\r\n", ssid);
+                    mgos_uart_printf(UART_NO, "S\r\n");
                 }
                 else
                 {
@@ -409,6 +409,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                         {
                             LOG(LL_INFO, ("GET HTTP url: %s", request->url.p));
                             mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, NULL);
+                            mgos_uart_printf(UART_NO, "S\r\n");
                         }
                         else if (request->method == 'P')
                         {
@@ -416,6 +417,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                             {
                                 LOG(LL_INFO, ("POST HTTP url: %s, data: %s", request->url.p, request->post_field.p));
                                 mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, request->post_field.p);
+                                mgos_uart_printf(UART_NO, "S\r\n");
                             }
                             else
                             {
@@ -424,6 +426,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                                    thing depending on the system) */
                                 LOG(LL_INFO, ("POST HTTP url: %s", request->url.p));
                                 mg_connect_http(mgos_get_mgr(), &ev_handler, response, request->url.p, headers, "");
+                                mgos_uart_printf(UART_NO, "S\r\n");
                             }
                         }
                     }
@@ -450,6 +453,9 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_SHR))
         {
             /* Status of HTTP request */
+            /* WARNING: severe caveat in firmware, use SHR sparingly or with more rigourous checking
+               when attempting to detect the HTTP connection state in the middle of a connection!
+               SHR may not respond at all under high CPU load (i.e. during HTTPS operations) */
             const enum str_len_state str_state = ulwi_validate_strlen(line.len, 5, 5);
             if (str_state == STRING_OK)
             {
