@@ -88,7 +88,7 @@ HTTP method types:
 **Command**: `sap`  
 **Type**: Reply  
 **Purpose**: Checks if the ESP8266 is properly connected to an access point.  
-**Returns**: `<S/U/P/N>,<ssid (only if connection is successful)>` based on the connectivity state.
+**Returns**: `<S/U/P/N>` based on the connectivity state.
 
 ### Disconnect from Access Point
 
@@ -144,7 +144,7 @@ HTTP method types:
 
 **Command**: `hhr <http request handle>|<headers>`  
 **Type**: Action  
-**Purpose**: Specifies the contents field of a HTTP request before sending the request. This is done separately from `ihr`.
+**Purpose**: Specifies the contents field of a HTTP request before sending the request. This is done separately from `ihr`.  
 **Parameters**:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
