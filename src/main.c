@@ -619,7 +619,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         ulwi_empty_request(request);
                         ulwi_empty_response(response);
-                        mgos_uart_printf(UART_NO, "\r\n");
+                        mgos_uart_printf(UART_NO, "S\r\n");
                     }
                     else
                     {
