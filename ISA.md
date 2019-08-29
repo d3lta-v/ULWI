@@ -208,7 +208,7 @@ HTTP method types:
 
 - `<http request handle>`: The HTTP request handle issued to you by the `ihr` command
 
-**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
+**Returns**: `S` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
 
 ## MQTT Operations
 
