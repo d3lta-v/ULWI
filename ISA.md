@@ -216,7 +216,7 @@ HTTP method types:
 
 **Command**: `mcg <T/F>|<server:port>|<T/F>(|<username>|<password>)`  
 **Type**: Reply  
-**Purpose**: Configures MQTT client with parameters    
+**Purpose**: Configures MQTT client with parameters  
 **Parameters**:
 
 - `<T/F>`: Boolean which enables or disables the MQTT client
@@ -225,7 +225,7 @@ HTTP method types:
 - `<username>` (Optional): Username for authenticating to the MQTT server
 - `<password>` (Optional): Password for authenticating to the MQTT server
 
-**Returns**: `\r\n` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
+**Returns**: `S` if command was executed successfully, `U` if the command failed (such as when there is no such handle or this handle is already empty)
 
 ### MQTT Is Connected
 

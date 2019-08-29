@@ -670,14 +670,14 @@ static void uart_dispatcher(int uart_no, void *arg)
                         mqtt_conf.enable = enable;
                         ulwi_mqtt_unsub_all();
                         mgos_mqtt_set_config(&mqtt_conf);
-                        mgos_uart_printf(UART_NO, "\r\n");
+                        mgos_uart_printf(UART_NO, "S\r\n");
                     }
                     else if (mqtt_conf.server != NULL)
                     {
                         /* Enable is true in this if statement, only allow enable if server field is not empty */
                         mqtt_conf.enable = enable;
                         mgos_mqtt_set_config(&mqtt_conf);
-                        mgos_uart_printf(UART_NO, "\r\n");
+                        mgos_uart_printf(UART_NO, "S\r\n");
                     }
                     else
                     {
@@ -693,7 +693,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     mqtt_conf.server = result[1];
                     mqtt_conf.ssl_ca_cert = enable_tls ? "rootca.pem" : NULL;
                     mgos_mqtt_set_config(&mqtt_conf);
-                    mgos_uart_printf(UART_NO, "\r\n");
+                    mgos_uart_printf(UART_NO, "S\r\n");
                 }
                 else if (param_len == 5)
                 {
@@ -708,7 +708,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                     {
                         if (mgos_mqtt_global_connect())
                         {
-                            mgos_uart_printf(UART_NO, "\r\n");
+                            mgos_uart_printf(UART_NO, "S\r\n");
                         }
                         else
                         {
