@@ -807,6 +807,7 @@ static void uart_dispatcher(int uart_no, void *arg)
                 ulwi_cpy_params_only(parameter_c_str, line.p, line.len);
                 if (ulwi_mqtt_sub_exists(parameter_c_str))
                 {
+                    //ulwi_mqtt_new_data_arrived(parameter_c_str) ? mgos_uart_printf(UART_NO, "\x11\x54\x13") : mgos_uart_printf(UART_NO, "\x11\x46\x13");
                     ulwi_mqtt_new_data_arrived(parameter_c_str) ? mgos_uart_printf(UART_NO, "T\r\n") : mgos_uart_printf(UART_NO, "F\r\n");
                 }
                 else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
@@ -832,8 +833,9 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (message != NULL)
                 {
                     struct mg_str buffer = mg_strdup_nul(*message);
+                    mgos_uart_write(UART_NO, XON, 1);
                     mgos_uart_write(UART_NO, buffer.p, buffer.len);
-                    mgos_uart_printf(UART_NO, "\r\n");
+                    mgos_uart_write(UART_NO, XOFF, 1);
                     mg_strfree(&buffer);
                 }
                 else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
