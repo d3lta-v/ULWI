@@ -838,15 +838,21 @@ static void uart_dispatcher(int uart_no, void *arg)
                     mgos_uart_write(UART_NO, XOFF, 1);
                     mg_strfree(&buffer);
                 }
-                else mgos_uart_printf(UART_NO, "U\r\n"); /* Subscription does not exist */
+                mgos_uart_write(UART_NO, XON, 1);
+                else mgos_uart_printf(UART_NO, "U"); /* Subscription does not exist */
+                mgos_uart_write(UART_NO, XOFF, 1);
             }
             else if (str_state == STRING_LONG)
             {
-                mgos_uart_printf(UART_NO, "long\r\n");
+                mgos_uart_write(UART_NO, XON, 1);
+                mgos_uart_printf(UART_NO, "long");
+                mgos_uart_write(UART_NO, XOFF, 1);
             }
             else if (str_state == STRING_SHORT)
             {
-                mgos_uart_printf(UART_NO, "short\r\n");
+                mgos_uart_write(UART_NO, XON, 1);
+                mgos_uart_printf(UART_NO, "short");
+                mgos_uart_write(UART_NO, XOFF, 1);
             }
         }
         else if (mg_str_starts_with(line, COMMAND_MPB))
