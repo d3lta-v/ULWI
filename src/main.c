@@ -838,9 +838,12 @@ static void uart_dispatcher(int uart_no, void *arg)
                     mgos_uart_write(UART_NO, XOFF, 1);
                     mg_strfree(&buffer);
                 }
-                mgos_uart_write(UART_NO, XON, 1);
-                else mgos_uart_printf(UART_NO, "U"); /* Subscription does not exist */
-                mgos_uart_write(UART_NO, XOFF, 1);
+                else
+                {
+                    mgos_uart_write(UART_NO, XON, 1);
+                    mgos_uart_printf(UART_NO, "U"); /* Subscription does not exist */
+                    mgos_uart_write(UART_NO, XOFF, 1);
+                }
             }
             else if (str_state == STRING_LONG)
             {
