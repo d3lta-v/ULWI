@@ -466,21 +466,29 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (handle >= 0)
                 {
                     struct http_response *response = &response_array[handle];
+                    // mgos_uart_write(UART_NO, XON_2, 1);
                     mgos_uart_printf(UART_NO, "%c\r\n", (char)response->progress);
+                    // mgos_uart_write(UART_NO, XOFF_2, 1);
                 }
                 else
                 {
                     /* Invalid handle */
+                    // mgos_uart_write(UART_NO, XON_2, 1);
                     mgos_uart_printf(UART_NO, "U\r\n");
+                    // mgos_uart_write(UART_NO, XOFF_2, 1);
                 }  
             }
             else if (str_state == STRING_LONG)
             {
+                // mgos_uart_write(UART_NO, XON_2, 1);
                 mgos_uart_printf(UART_NO, "long\r\n");
+                // mgos_uart_write(UART_NO, XOFF_2, 1);
             }
             else if (str_state == STRING_SHORT)
             {
+                // mgos_uart_write(UART_NO, XON_2, 1);
                 mgos_uart_printf(UART_NO, "short\r\n");
+                // mgos_uart_write(UART_NO, XOFF_2, 1);
             }
         }
         else if (mg_str_starts_with(line, COMMAND_GHR))
@@ -557,16 +565,22 @@ static void uart_dispatcher(int uart_no, void *arg)
                         {
                         case STATE:
                             /* Get http_response */
-                            mgos_uart_printf(UART_NO, "%i\r\n", http_response->status);
+                            mgos_uart_write(UART_NO, XON_1, 1);
+                            mgos_uart_printf(UART_NO, "%i", http_response->status);
+                            mgos_uart_write(UART_NO, XOFF_1, 1);
                             break;
                         case HEADER:
                             /* Get headers of the HTTP response */
-                            mgos_uart_printf(UART_NO, "%s\r\n", http_response->headers);
+                            mgos_uart_write(UART_NO, XON_1, 1);
+                            mgos_uart_printf(UART_NO, "%s", http_response->headers);
+                            mgos_uart_write(UART_NO, XOFF_1, 1);
                             break;
                         case CONTENT:
                             /* Get content of the HTTP response */
                             /* TODO: Ensure proper null termination here */
-                            mgos_uart_printf(UART_NO, "%s\r\n", http_response->content.p);
+                            mgos_uart_write(UART_NO, XON_1, 1);
+                            mgos_uart_printf(UART_NO, "%s", http_response->content.p);
+                            mgos_uart_write(UART_NO, XOFF_1, 1);
                             break;
                         default:
                             break;
@@ -582,21 +596,29 @@ static void uart_dispatcher(int uart_no, void *arg)
                     }
                     else
                     {
-                        mgos_uart_printf(UART_NO, "U\r\n");
+                        mgos_uart_write(UART_NO, XON_1, 1);
+                        mgos_uart_printf(UART_NO, "U");
+                        mgos_uart_write(UART_NO, XOFF_1, 1);
                     }
                 }
                 else
                 {
-                    mgos_uart_printf(UART_NO, "short\r\n");
+                    mgos_uart_write(UART_NO, XON_1, 1);
+                    mgos_uart_printf(UART_NO, "short");
+                    mgos_uart_write(UART_NO, XOFF_1, 1);
                 }
             }
             else if (str_state == STRING_LONG)
             {
-                mgos_uart_printf(UART_NO, "long\r\n");
+                mgos_uart_write(UART_NO, XON_1, 1);
+                mgos_uart_printf(UART_NO, "long");
+                mgos_uart_write(UART_NO, XOFF_1, 1);
             }
             else if (str_state == STRING_SHORT)
             {
-                mgos_uart_printf(UART_NO, "short\r\n");
+                mgos_uart_write(UART_NO, XON_1, 1);
+                mgos_uart_printf(UART_NO, "short");
+                mgos_uart_write(UART_NO, XOFF_1, 1);
             }
         }
         else if (mg_str_starts_with(line, COMMAND_DHR))
@@ -833,29 +855,29 @@ static void uart_dispatcher(int uart_no, void *arg)
                 if (message != NULL)
                 {
                     struct mg_str buffer = mg_strdup_nul(*message);
-                    mgos_uart_write(UART_NO, XON, 1);
+                    mgos_uart_write(UART_NO, XON_1, 1);
                     mgos_uart_write(UART_NO, buffer.p, buffer.len);
-                    mgos_uart_write(UART_NO, XOFF, 1);
+                    mgos_uart_write(UART_NO, XOFF_1, 1);
                     mg_strfree(&buffer);
                 }
                 else
                 {
-                    mgos_uart_write(UART_NO, XON, 1);
+                    mgos_uart_write(UART_NO, XON_1, 1);
                     mgos_uart_printf(UART_NO, "U"); /* Subscription does not exist */
-                    mgos_uart_write(UART_NO, XOFF, 1);
+                    mgos_uart_write(UART_NO, XOFF_1, 1);
                 }
             }
             else if (str_state == STRING_LONG)
             {
-                mgos_uart_write(UART_NO, XON, 1);
+                mgos_uart_write(UART_NO, XON_1, 1);
                 mgos_uart_printf(UART_NO, "long");
-                mgos_uart_write(UART_NO, XOFF, 1);
+                mgos_uart_write(UART_NO, XOFF_1, 1);
             }
             else if (str_state == STRING_SHORT)
             {
-                mgos_uart_write(UART_NO, XON, 1);
+                mgos_uart_write(UART_NO, XON_1, 1);
                 mgos_uart_printf(UART_NO, "short");
-                mgos_uart_write(UART_NO, XOFF, 1);
+                mgos_uart_write(UART_NO, XOFF_1, 1);
             }
         }
         else if (mg_str_starts_with(line, COMMAND_MPB))

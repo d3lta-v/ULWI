@@ -4,7 +4,7 @@ This document provides an outline of the instruction set, version 1.0-alpha1. Al
 
 If you are confused about what this instruction set is supposed to do, please read the original [README](README.md) document.
 
-All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To work with messages involving multiple lines, please use UNIX style line endings (`\n`).
+All commands and replies are terminated with a Windows style line ending, `\r\n` unless otherwise noted. To work with messages involving multiple lines, please use UNIX style line endings (`\n`). However, some commands requiring quick response which may cause serial buffer problems are prepended and appended with  ASCII flow control characters. There are two types of flow control characters referenced in this guide: `XON_1/XOFF_1` and `XON_2/XOFF_2`. `XON_1/XOFF_1` refers to the standard XON and XOFF characters 0x11 and 0x13 respectively, whereas `XON_2/XOFF_2` refers to 0x12 and 0x14 respectively. `XON_1/XOFF_1` is used for large replies like getting HTTP responses while `XON_2/XOFF_2` is used for fast reply mechanisms like getting the HTTP status.
 
 In addition, all parameters are delimited with the ASCII Unit Separator control character (0x1F) to avoid excessive use of escape characters or sequences. **This character is represented by the vertical bar character (|) in the rest of this manual.**
 

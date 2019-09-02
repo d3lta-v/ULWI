@@ -26,8 +26,10 @@
 #define HTTP_HANDLES_MAX 3
 
 static const char ULWI_DELIMITER[] = "\x1f";
-static const char XON[] = "\x11";
-static const char XOFF[] = "\x13";
+static const char XON_1[] = "\x11";
+static const char XOFF_1[] = "\x13";
+static const char XON_2[] = "\x12";
+static const char XOFF_2[] = "\x14";
 
 /* General operations commands */
 static const struct mg_str COMMAND_NOP = MG_MK_STR("nop");
