@@ -1,6 +1,6 @@
 # Ultra Light Wi-Fi Interface Firmware - ULWI
 
-**This firmware is in ALPHA and is incomplete**  
+**This firmware is in BETA and is incomplete**  
 The ULWI firmware aims to convert the original AT command line interface of the ESP8266 into an extremely lightweight and robust command-reply style interface, with a command set inspired by assembly mnemonics.
 
 This firmware is developed for devices that intend to interface to the ESP8266 in a master-slave configuration, whereas the device in question acts as the master while the ESP8266 acts as the slave.

@@ -146,7 +146,7 @@ static void uart_dispatcher(int uart_no, void *arg)
         else if (mg_str_starts_with(line, COMMAND_VER) && line.len == 3)
         {
             /* Print Version */
-            mgos_uart_printf(UART_NO, "v1.0-alpha1\r\n");
+            mgos_uart_printf(UART_NO, "%s\r\n", mgos_sys_config_get_version());
         }
         else if (mg_str_starts_with(line, COMMAND_RST) && line.len == 3)
         {

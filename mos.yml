@@ -1,6 +1,6 @@
-author: mongoose-os
-description: A Mongoose OS app skeleton
-version: 1.0
+author: d3lta-v
+description: A ultralight Wi-Fi interface firmware for the ESP8266
+version: 0.1.0
 
 libs_version: ${mos.version}
 modules_version: ${mos.version}
@@ -23,6 +23,7 @@ filesystem:
 # Uncomment and modify according to your needs:
 
 config_schema:
+  - ["version", "s", "0.1.0", {"title": "Version String"}]
   - ["wifi.ap.enable", false]
   - ["wifi.ap.keep_enabled", false]
 #  - ["my_app", "o", {title: "My app custom settings"}]
